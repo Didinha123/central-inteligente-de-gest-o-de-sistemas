@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SystemHub — Central de Sistemas</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1b3d'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h14' stroke='%23fcc419' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      // aplica o tema antes da renderização para evitar "flash" de cor
+      try {
+        var t = localStorage.getItem('sh-theme');
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"><div class="boot"><span class="spinner"></span></div></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="overlays"></div>
+    <noscript>O SystemHub precisa de JavaScript habilitado.</noscript>
+
+    <script src="script.js"></script>
+  </body>
+</html>
