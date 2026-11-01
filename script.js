@@ -62,6 +62,14 @@ const P = {
   save: '<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7M7 3v4a1 1 0 0 0 1 1h7"/>',
   'corner-down-left': '<path d="m9 10-5 5 5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>',
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  'help-circle': '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>',
+  'hard-drive': '<path d="M22 12H2M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11ZM6 16h.01M10 16h.01"/>',
+  settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  copy: '<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  whatsapp: '<path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10c0 3 2 5 5 5l1.2-1.2-2-1-1 .7c-1-.5-1.7-1.2-2.2-2.2l.7-1-1-2Z"/>',
+  'check-square': '<path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  plug: '<path d="M12 22v-5M9 8V2M15 8V2M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
   // ---- ícones dos sistemas ----
   box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
   archive: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
@@ -105,7 +113,6 @@ const SYSTEM_ICON_NAMES = [
 function icon(name, cls = '') {
   return `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[name] ?? P.box}</svg>`;
 }
-
 
 // ===================== constants =====================
 const STATUS = {
@@ -152,6 +159,7 @@ const TICKET_STATUS = {
 const TICKET_STATUS_ORDER = ['backlog', 'analysis', 'development', 'testing', 'done'];
 
 const TICKET_TYPE = {
+  question: { label: 'Dúvida', icon: 'help-circle' },
   bug: { label: 'Bug', icon: 'bug' },
   improvement: { label: 'Melhoria', icon: 'sparkles' },
   feature: { label: 'Nova funcionalidade', icon: 'rocket' },
@@ -166,13 +174,24 @@ const ROLE = {
   user: { label: 'Usuário', description: 'Visualiza e acessa sistemas permitidos' },
 };
 
+const BACKUP_HEALTH = {
+  ok: { label: 'Em dia', tone: 'ok' },
+  late: { label: 'Atrasado', tone: 'warn' },
+  failed: { label: 'Falhou', tone: 'bad' },
+  never: { label: 'Nunca executado', tone: 'neutral' },
+  inactive: { label: 'Inativa', tone: 'neutral' },
+};
+const BACKUP_TYPE = { full: 'Completo', incremental: 'Incremental', differential: 'Diferencial', snapshot: 'Snapshot' };
+const BACKUP_FREQ = { hourly: 'A cada hora', daily: 'Diário', weekly: 'Semanal', monthly: 'Mensal' };
+const CLIENT_STATUS = { active: { label: 'Ativo', tone: 'ok' }, inactive: { label: 'Inativo', tone: 'neutral' } };
+const UF = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
+
 const DEFAULT_CATEGORIES = [
   'Financeiro', 'Recursos Humanos', 'Comercial', 'Operações', 'Logística', 'Atendimento', 'Dados & BI',
   'Infraestrutura', 'Segurança', 'Jurídico', 'Marketing',
 ];
 
 const COLORS = ['#244487', '#1d4ed8', '#0891b2', '#0f766e', '#16a34a', '#ca8a04', '#ea580c', '#dc2626', '#db2777', '#7c3aed', '#475569', '#0d1b3d'];
-
 
 // ===================== format =====================
 const dateFmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -223,7 +242,6 @@ const initials = (name) =>
 const isOverdue = (date, done = false) => !!date && !done && date < new Date().toISOString().slice(0, 10);
 
 const normalize = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-
 
 // ===================== ui =====================
 // ---------- templates seguros ----------
@@ -487,7 +505,6 @@ function bindToggles(root, state, onChange) {
   });
 }
 
-
 // ===================== charts =====================
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -598,17 +615,28 @@ function barChart(el, data, { onSelect } = {}) {
   });
 }
 
-
-
 // ===================== database =====================
 // =====================================================================
-// Banco de dados local do SystemHub (salvo no navegador via localStorage)
+// Banco de dados do SystemHub
+//  • Modo LOCAL: dados salvos neste navegador (localStorage) — ideal para demonstração.
+//  • Modo SUPABASE: dados salvos no seu projeto Supabase (PostgreSQL na nuvem), compartilhados
+//    por toda a equipe, com login pelo Supabase Auth e regras de acesso (RLS) no banco.
 // Convenções de origem dos dados:
 //   data_origin   -> 'real' (integração real), 'manual' (cadastro humano), 'demo' (FICTÍCIO)
 //   status_source -> 'automatic' (verificação técnica real), 'manual', 'simulated' (gerado p/ demo)
 // =====================================================================
 
+// ---------------------------------------------------------------------
+// CONEXÃO COM O SUPABASE
+// Opção 1 (mais simples): preencha na tela Configurações do sistema.
+// Opção 2 (para hospedar e compartilhar com a equipe): preencha aqui.
+// A chave "anon public" pode ficar no navegador — a proteção é feita pelo RLS do banco.
+// ---------------------------------------------------------------------
+const SUPABASE_URL = ''; // ex.: 'https://abcdefgh.supabase.co'
+const SUPABASE_ANON_KEY = ''; // ex.: 'eyJhbGciOi...'
+
 const DB_KEY = 'systemhub-db-v1';
+const CONFIG_KEY = 'systemhub-config';
 const HOUR = 3600_000;
 const DAY = 24 * HOUR;
 const nowIso = () => new Date().toISOString();
@@ -617,42 +645,77 @@ const agoIso = (ms) => new Date(Date.now() - ms).toISOString();
 const TABLES = [
   'users', 'teams', 'people', 'systems', 'system_contacts', 'system_access', 'system_versions', 'health_checks',
   'incidents', 'tickets', 'ticket_events', 'favorites', 'recent_access', 'notifications', 'audit_logs',
+  'clients', 'backup_jobs', 'backup_runs', 'settings',
 ];
 
 let DB = null;
+let configOverride = null; // usado pelo link público de chamados
+
+function getConfig() {
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '{}') ?? {};
+  } catch {
+    saved = {};
+  }
+  const src = configOverride ?? saved;
+  const url = String(SUPABASE_URL || src.supabaseUrl || '').trim().replace(/\/+$/, '');
+  const key = String(SUPABASE_ANON_KEY || src.supabaseKey || '').trim();
+  return { supabaseUrl: url, supabaseKey: key, remote: !!(url && key), fixed: !!(SUPABASE_URL && SUPABASE_ANON_KEY) };
+}
+function saveConfig(cfg) {
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+}
+const isRemote = () => getConfig().remote;
 
 function emptyDb() {
-  const d = { version: 1, seq: {} };
+  const d = { version: 2, seq: {} };
   for (const t of TABLES) d[t] = [];
+  return d;
+}
+
+/** Garante que bancos salvos em versões anteriores tenham as tabelas novas. */
+function migrateDb(d) {
+  d.seq ??= {};
+  for (const t of TABLES) d[t] ??= [];
+  for (const t of d.tickets) {
+    t.source ??= 'internal';
+    for (const k of ['client_id', 'requester_name', 'requester_phone', 'requester_email', 'requester_company', 'resolution']) t[k] ??= null;
+  }
   return d;
 }
 
 function loadDb() {
   try {
     const raw = localStorage.getItem(DB_KEY);
-    if (raw) DB = JSON.parse(raw);
+    if (raw) DB = migrateDb(JSON.parse(raw));
   } catch {
     DB = null;
   }
   return DB;
 }
 
-let saveTimer = null;
 function saveDb() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(DB_KEY, JSON.stringify(DB));
-    } catch (err) {
-      console.error('Falha ao salvar dados no navegador', err);
-    }
-  }, 50);
+  if (isRemote()) return scheduleSync();
+  if (!DB) return;
+  try {
+    localStorage.setItem(DB_KEY, JSON.stringify(DB));
+  } catch (err) {
+    console.error('Falha ao salvar dados no navegador', err);
+  }
 }
 
 /** Insere um registro e devolve o objeto com id. */
 function insert(table, row) {
-  DB.seq[table] = (DB.seq[table] ?? 0) + 1;
-  const rec = { id: DB.seq[table], ...row };
+  let id;
+  if (isRemote()) {
+    // ids aleatórios evitam colisão entre usuários gravando ao mesmo tempo
+    do id = 10_000_000 + Math.floor(Math.random() * 89_999_999); while (DB[table].some((r) => r.id === id));
+  } else {
+    DB.seq[table] = (DB.seq[table] ?? DB[table].reduce((m, r) => Math.max(m, r.id), 0)) + 1;
+    id = DB.seq[table];
+  }
+  const rec = { id, ...row };
   DB[table].push(rec);
   return rec;
 }
@@ -753,15 +816,45 @@ const SEED_TICKETS = [
   ['Agenda duplicando reservas recorrentes', 'bug', 'agenda-salas', 'low', 'analysis', 'Reservas semanais aparecem duplicadas após edição.', null, 15],
 ];
 
+// nome, tipo (PJ/PF), documento, contato, e-mail, WhatsApp, cidade, UF, status, sistemas usados, observações
+const SEED_CLIENTS = [
+  ['Atacadão Horizonte Ltda.', 'PJ', '12.345.678/0001-90', 'Paula Ribeiro', 'financeiro@horizonte.exemplo.com', '(11) 98888-1234', 'São Paulo', 'SP', 'active', ['portal-financeiro', 'ecommerce-b2b'], 'Cliente desde 2021 (fictício).'],
+  ['Distribuidora Litoral S.A.', 'PJ', '98.765.432/0001-10', 'Marcos Vieira', 'compras@litoral.exemplo.com', '(21) 97777-5678', 'Rio de Janeiro', 'RJ', 'active', ['ecommerce-b2b', 'crm-vendas'], ''],
+  ['Mercado Serra Azul ME', 'PJ', '11.222.333/0001-44', 'Renato Dias', 'contato@serraazul.exemplo.com', '(31) 96666-9012', 'Belo Horizonte', 'MG', 'active', ['ecommerce-b2b'], ''],
+  ['Construtora Alicerce', 'PJ', '55.666.777/0001-88', 'Lívia Torres', 'ti@alicerce.exemplo.com', '(41) 95555-3456', 'Curitiba', 'PR', 'inactive', ['portal-financeiro'], 'Contrato encerrado em 2025 (fictício).'],
+  ['João Pedro Andrade', 'PF', '123.456.789-09', 'João Pedro Andrade', 'joao.andrade@exemplo.com', '(51) 94444-7890', 'Porto Alegre', 'RS', 'active', ['base-conhecimento'], ''],
+];
+
+// sistema, nome da rotina, tipo, frequência, destino, retenção (dias), responsável, perfil da simulação
+const SEED_BACKUPS = [
+  ['erp-corporativo', 'Banco Oracle — completo', 'full', 'daily', 'Storage S3 (região sa-east-1)', 30, 7, 'ok'],
+  ['erp-corporativo', 'Logs de transação', 'incremental', 'hourly', 'Storage S3 (região sa-east-1)', 7, 7, 'ok'],
+  ['portal-financeiro', 'PostgreSQL — completo', 'full', 'daily', 'Azure Blob (cofre)', 35, 0, 'ok'],
+  ['folha-pagamento', 'SQL Server — completo', 'full', 'daily', 'Servidor de backup on-premises', 90, 2, 'fail'],
+  ['ecommerce-b2b', 'Snapshot dos volumes', 'snapshot', 'daily', 'Snapshots do provedor de nuvem', 14, 3, 'ok'],
+  ['crm-vendas', 'PostgreSQL — completo', 'full', 'weekly', 'Storage S3 (região sa-east-1)', 60, 3, 'ok'],
+  ['legado-contabil', 'Firebird — cópia de arquivos', 'full', 'weekly', 'NAS do datacenter', 365, 1, 'late'],
+  ['data-lake', 'Catálogo e metadados', 'differential', 'daily', 'Bucket de arquivamento', 30, 8, 'ok'],
+  ['gestao-acessos-iam', 'Keycloak — exportação do realm', 'full', 'daily', 'Cofre de segredos + S3', 30, 10, 'ok'],
+  ['inventario-ativos', 'PostgreSQL — completo', 'full', 'monthly', 'NAS do datacenter', 180, 7, 'ok'],
+];
+
 /** Taxa de falha usada SOMENTE nas verificações simuladas de sistemas fictícios. */
 const SIMULATION_FAIL_RATE = { 'legado-contabil': 1, 'roteirizador-entregas': 0.3 };
 const simulatedFailRate = (slug) => SIMULATION_FAIL_RATE[slug] ?? 0.008;
 
-async function seedDemo() {
-  DB = emptyDb();
-  const hash = await hashPassword(DEMO_PASSWORD);
+/**
+ * Cria os dados demonstrativos. Com merge=true (modo Supabase) adiciona aos dados existentes:
+ * os usuários fictícios entram inativos e sem login, apenas para dar nome aos registros.
+ */
+async function seedDemo({ merge = false } = {}) {
+  if (!merge) DB = emptyDb();
+  const hash = merge ? null : await hashPassword(DEMO_PASSWORD);
   const userIds = SEED_USERS.map(([name, email, role]) =>
-    insert('users', { name, email, role, password_hash: hash, active: true, is_demo: true, created_at: nowIso(), last_login_at: null }).id);
+    insert('users', {
+      name, role, password_hash: hash, active: !merge, is_demo: true, auth_id: null, created_at: nowIso(), last_login_at: null,
+      email: merge ? email.replace('@systemhub.local', '.demo@exemplo.com') : email,
+    }).id);
   const [adminId, managerId, devId, , userId] = userIds;
   const teamIds = SEED_TEAMS.map(([name, description]) => insert('teams', { name, description, is_demo: true, created_at: nowIso() }).id);
   const personIds = SEED_PEOPLE.map(([name, title, team], i) => insert('people', {
@@ -838,6 +931,8 @@ async function seedDemo() {
       assignee_id: assignee == null ? null : userIds[assignee], reporter_id: pos[status] % 2 === 0 ? managerId : userId,
       priority, status, due_date: due == null ? null : new Date(Date.now() + due * DAY).toISOString().slice(0, 10),
       position: ++pos[status], is_demo: true, created_at: agoIso(created * DAY), updated_at: agoIso(DAY), closed_at: status === 'done' ? agoIso(DAY) : null,
+      source: 'internal', client_id: null, requester_name: null, requester_phone: null, requester_email: null, requester_company: null,
+      resolution: status === 'done' ? 'Correção aplicada em produção e validada com o solicitante (fictício).' : null,
     });
     insert('ticket_events', { ticket_id: t.id, user_id: managerId, kind: 'created', message: 'Chamado aberto em "Backlog"', created_at: agoIso(created * DAY) });
     if (status !== 'backlog') {
@@ -852,23 +947,403 @@ async function seedDemo() {
     insert('recent_access', { user_id: adminId, system_id: ids[slug], accessed_at: agoIso((i * 5 + 1) * HOUR) }));
   insert('system_access', { system_id: ids['folha-pagamento'], user_id: userId });
 
+  // ---- clientes (fictícios) ----
+  const clientIds = SEED_CLIENTS.map(([name, kind, document, contact, email, phone, city, state, status, systems, notes]) => insert('clients', {
+    name, kind, document, contact_name: contact, email, phone, city, state, status, notes,
+    system_ids: systems.map((s) => ids[s]).filter(Boolean), is_demo: true, created_at: agoIso(200 * DAY), updated_at: agoIso(10 * DAY),
+  }).id);
+
+  // ---- chamados abertos pelo link público (fictícios) ----
+  for (const [title, type, slug, desc, ci, name, phone, email] of [
+    ['Como emitir a segunda via do boleto?', 'question', 'portal-financeiro', 'Não encontro a opção de segunda via no portal.', 0, 'Paula Ribeiro', '(11) 98888-1234', 'paula@exemplo.com'],
+    ['Erro ao acessar o pedido 4521', 'bug', 'ecommerce-b2b', 'Ao abrir o pedido aparece "erro inesperado".', 1, 'Marcos Vieira', '(21) 97777-5678', 'marcos@exemplo.com'],
+  ]) {
+    const t = insert('tickets', {
+      title, description: `${desc}\n\n(Chamado fictício para demonstração.)`, type, system_id: ids[slug], assignee_id: null, reporter_id: null,
+      priority: 'medium', status: 'backlog', due_date: null, position: 0, is_demo: true, created_at: agoIso(3 * HOUR), updated_at: agoIso(3 * HOUR), closed_at: null,
+      source: 'public', client_id: clientIds[ci], requester_name: name, requester_phone: phone, requester_email: email, requester_company: SEED_CLIENTS[ci][0], resolution: null,
+    });
+    insert('ticket_events', { ticket_id: t.id, user_id: null, kind: 'created', message: `Chamado aberto pelo formulário público por ${name}`, created_at: agoIso(3 * HOUR) });
+  }
+
+  // ---- rotinas de backup (fictícias) ----
+  const FREQ_HOURS = { hourly: 1, daily: 24, weekly: 168, monthly: 720 };
+  for (const [slug, name, type, frequency, destination, retention, owner, profile] of SEED_BACKUPS) {
+    const job = insert('backup_jobs', {
+      system_id: ids[slug], name, type, frequency, schedule: frequency === 'daily' ? 'Todos os dias às 02:00' : frequency === 'weekly' ? 'Domingos às 03:00' : frequency === 'hourly' ? 'A cada hora' : 'Dia 1 às 04:00',
+      destination, retention_days: retention, responsible_id: personIds[owner], active: true, notes: 'Rotina fictícia para demonstração.',
+      last_run_at: null, last_status: 'never', last_success_at: null, last_size_mb: null, is_demo: true, created_at: agoIso(120 * DAY), updated_at: agoIso(5 * DAY),
+    });
+    const step = FREQ_HOURS[frequency] * HOUR;
+    const runs = Math.min(14, Math.floor((30 * DAY) / step));
+    for (let i = runs; i >= 1; i--) {
+      // perfis: 'ok' sempre sucesso; 'fail' última execução falhou; 'late' parou de rodar há dias
+      const failed = (profile === 'fail' && i === 1) || (profile === 'ok' && Math.random() < 0.04);
+      const start = Date.now() - (i + (profile === 'late' ? 2 : 0)) * step + 2 * HOUR; // 'late': parou de rodar há 2 ciclos
+      const size = Math.round((200 + Math.random() * 4000) * 10) / 10;
+      insert('backup_runs', {
+        job_id: job.id, started_at: new Date(start).toISOString(), finished_at: new Date(start + (5 + Math.random() * 50) * 60_000).toISOString(),
+        status: failed ? 'failed' : 'success', size_mb: failed ? null : size, notes: failed ? 'Falha simulada: destino sem espaço (fictício)' : null, source: 'simulated', created_by: null,
+      });
+    }
+    const jr = DB.backup_runs.filter((r) => r.job_id === job.id);
+    const last = jr.at(-1);
+    const lastOk = jr.filter((r) => r.status === 'success').at(-1);
+    Object.assign(job, { last_run_at: last?.finished_at ?? null, last_status: last?.status ?? 'never', last_success_at: lastOk?.finished_at ?? null, last_size_mb: lastOk?.size_mb ?? null });
+  }
+
+  if (!DB.settings.some((s) => s.key === 'owner_whatsapp')) insert('settings', { key: 'owner_whatsapp', value: '' });
+
   insert('notifications', { user_id: adminId, type: 'incident', title: 'Legado Contábil está indisponível [simulado]', message: 'Falha simulada (dado demonstrativo)', link: `/systems/${legacy.id}`, read_at: null, created_at: agoIso(6 * HOUR) });
   insert('notifications', { user_id: adminId, type: 'info', title: 'Bem-vindo ao SystemHub', message: 'Os dados exibidos são fictícios e servem apenas para demonstração.', link: '/', read_at: null, created_at: agoIso(DAY) });
   insert('audit_logs', { user_id: null, user_name: 'Sistema', action: 'seed', entity: 'system', entity_id: null, summary: 'Dados demonstrativos (fictícios) carregados', details: null, ip: null, created_at: nowIso() });
   saveDb();
 }
 
-/** Inicializa o banco: carrega do navegador ou cria com dados demonstrativos. */
+/** Inicializa o banco: Supabase (se configurado e logado) ou dados deste navegador. */
 async function initDb() {
+  if (isRemote()) {
+    DB = emptyDb();
+    if (sbSession()) {
+      try {
+        await sbReload();
+      } catch (err) {
+        console.error(err);
+        sbClearSession();
+      }
+    }
+    return;
+  }
   if (!loadDb()) await seedDemo();
 }
 
-/** Apaga tudo e recria os dados demonstrativos. */
+/** Apaga tudo e recria os dados demonstrativos (modo local). */
 async function resetDb() {
   localStorage.removeItem(DB_KEY);
   await seedDemo();
 }
 
+// ===================== supabase =====================
+// =====================================================================
+// Conexão com o Supabase via API REST (sem bibliotecas externas)
+//  • Login: Supabase Auth (e-mail e senha)
+//  • Dados: tabelas PostgreSQL acessadas pela API REST (PostgREST)
+//  • Segurança: Row Level Security (RLS) — script em SUPABASE_SETUP_SQL
+// =====================================================================
+
+const SB_SESSION_KEY = 'systemhub-sb-session';
+
+/** Colunas de cada tabela no Supabase (usadas na sincronização). */
+const SB_COLUMNS = {
+  users: ['id', 'auth_id', 'name', 'email', 'role', 'active', 'is_demo', 'password_hash', 'created_at', 'last_login_at'],
+  teams: ['id', 'name', 'description', 'is_demo', 'created_at'],
+  people: ['id', 'name', 'email', 'phone', 'title', 'team_id', 'is_demo', 'created_at'],
+  systems: ['id', 'slug', 'name', 'icon', 'color', 'description', 'category', 'url', 'technical_owner_id', 'team_id', 'status', 'status_source',
+    'status_note', 'status_updated_at', 'version', 'last_update_at', 'criticality', 'technologies', 'data_sources', 'integrations',
+    'documentation_url', 'documentation', 'healthcheck_url', 'monitoring_enabled', 'pending_update', 'restricted', 'data_origin',
+    'last_check_at', 'last_latency_ms', 'created_at', 'updated_at'],
+  system_contacts: ['id', 'system_id', 'person_id', 'role'],
+  system_access: ['id', 'system_id', 'user_id'],
+  system_versions: ['id', 'system_id', 'version', 'notes', 'released_at', 'created_by'],
+  health_checks: ['id', 'system_id', 'checked_at', 'ok', 'status_code', 'latency_ms', 'error', 'source'],
+  incidents: ['id', 'system_id', 'title', 'description', 'severity', 'status', 'source', 'started_at', 'resolved_at', 'created_by'],
+  tickets: ['id', 'title', 'description', 'type', 'system_id', 'assignee_id', 'reporter_id', 'priority', 'status', 'due_date', 'position',
+    'is_demo', 'created_at', 'updated_at', 'closed_at', 'source', 'client_id', 'requester_name', 'requester_phone', 'requester_email',
+    'requester_company', 'resolution'],
+  ticket_events: ['id', 'ticket_id', 'user_id', 'kind', 'message', 'created_at'],
+  favorites: ['id', 'user_id', 'system_id'],
+  recent_access: ['id', 'user_id', 'system_id', 'accessed_at'],
+  notifications: ['id', 'user_id', 'type', 'title', 'message', 'link', 'read_at', 'created_at'],
+  audit_logs: ['id', 'user_id', 'user_name', 'action', 'entity', 'entity_id', 'summary', 'details', 'ip', 'created_at'],
+  clients: ['id', 'name', 'kind', 'document', 'contact_name', 'email', 'phone', 'city', 'state', 'status', 'notes', 'system_ids', 'is_demo',
+    'created_at', 'updated_at'],
+  backup_jobs: ['id', 'system_id', 'name', 'type', 'frequency', 'schedule', 'destination', 'retention_days', 'responsible_id', 'active',
+    'notes', 'last_run_at', 'last_status', 'last_success_at', 'last_size_mb', 'is_demo', 'created_at', 'updated_at'],
+  backup_runs: ['id', 'job_id', 'started_at', 'finished_at', 'status', 'size_mb', 'notes', 'source', 'created_by'],
+  settings: ['id', 'key', 'value'],
+};
+
+const SB_TYPES = {
+  id: 'bigint primary key', auth_id: 'uuid unique', entity_id: 'text', created_by: 'bigint', technologies: 'jsonb', data_sources: 'jsonb', integrations: 'jsonb', details: 'jsonb',
+  system_ids: 'jsonb', active: 'boolean', is_demo: 'boolean', monitoring_enabled: 'boolean', pending_update: 'boolean', restricted: 'boolean',
+  ok: 'boolean', position: 'double precision', size_mb: 'double precision', last_size_mb: 'double precision',
+};
+const sbColType = (c) => SB_TYPES[c] ?? (/_id$|_ms$|_code$|_days$/.test(c) ? 'bigint' : 'text');
+
+/** Script de instalação: tabelas, funções, gatilhos e políticas de segurança (RLS). */
+const SUPABASE_SETUP_SQL = `-- =============================================================
+-- SystemHub — instalação no Supabase
+-- Cole tudo no "SQL Editor" do seu projeto e clique em RUN.
+-- Pode ser executado de novo sem perder dados.
+-- =============================================================
+
+${Object.entries(SB_COLUMNS).map(([t, cols]) => `create table if not exists public.${t} (\n${cols.map((c) => `  ${c} ${sbColType(c)}`).join(',\n')}\n);\n${cols.filter((c) => c !== 'id').map((c) => `alter table public.${t} add column if not exists ${c} ${sbColType(c).replace(' unique', '')};`).join('\n')}`).join('\n\n')}
+
+create index if not exists idx_checks_system on public.health_checks (system_id, checked_at);
+create index if not exists idx_tickets_status on public.tickets (status, position);
+
+-- Papel (perfil) do usuário logado
+create or replace function public.sh_role() returns text
+language sql stable security definer set search_path = public as $$
+  select role from public.users where auth_id = auth.uid() and active is true limit 1
+$$;
+
+-- Indica se já existe algum usuário com login (para criar o primeiro administrador)
+create or replace function public.sh_has_users() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.users where auth_id is not null)
+$$;
+grant execute on function public.sh_role() to anon, authenticated;
+grant execute on function public.sh_has_users() to anon, authenticated;
+
+-- Somente administradores mudam perfil, e-mail ou status de usuários
+create or replace function public.sh_users_guard() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if coalesce(public.sh_role(), '') <> 'admin' then
+    new.role := old.role;
+    new.active := old.active;
+    new.email := old.email;
+  end if;
+  return new;
+end $$;
+drop trigger if exists sh_users_guard on public.users;
+create trigger sh_users_guard before update on public.users for each row execute function public.sh_users_guard();
+
+-- Chamados do formulário público: registra histórico e notifica a equipe
+create or replace function public.sh_public_ticket() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare v_id bigint;
+begin
+  if new.source = 'public' then
+    v_id := 10000000 + floor(random() * 89999999)::bigint;
+    insert into public.ticket_events (id, ticket_id, user_id, kind, message, created_at)
+      values (v_id, new.id, null, 'created', 'Chamado aberto pelo formulário público por ' || coalesce(new.requester_name, 'solicitante'), new.created_at);
+    insert into public.notifications (id, user_id, type, title, message, link, read_at, created_at)
+      select 10000000 + floor(random() * 89999999)::bigint, u.id, 'ticket',
+             'Novo chamado pelo link público: ' || new.title, coalesce(new.requester_name, ''), '/tickets?open=' || new.id, null, new.created_at
+        from public.users u where u.active and u.role in ('admin', 'manager', 'developer');
+  end if;
+  return new;
+end $$;
+drop trigger if exists sh_public_ticket on public.tickets;
+create trigger sh_public_ticket after insert on public.tickets for each row execute function public.sh_public_ticket();
+
+-- Lista de sistemas exibida no formulário público (apenas id e nome dos não restritos)
+create or replace view public.public_systems as
+  select id, name from public.systems where coalesce(restricted, false) = false order by name;
+grant select on public.public_systems to anon, authenticated;
+
+-- ---------- Row Level Security ----------
+do $$
+declare t text;
+begin
+  foreach t in array array[${Object.keys(SB_COLUMNS).map((t) => `'${t}'`).join(', ')}] loop
+    execute format('alter table public.%I enable row level security', t);
+    execute format('drop policy if exists sh_select on public.%I', t);
+    execute format('drop policy if exists sh_insert on public.%I', t);
+    execute format('drop policy if exists sh_update on public.%I', t);
+    execute format('drop policy if exists sh_delete on public.%I', t);
+    execute format('drop policy if exists sh_public_insert on public.%I', t);
+  end loop;
+
+  -- Tabelas administradas pela equipe (admin, gestor, desenvolvedor)
+  foreach t in array array['teams','people','systems','system_contacts','system_access','system_versions','health_checks','incidents','clients','backup_jobs','backup_runs','settings'] loop
+    execute format('create policy sh_select on public.%I for select to authenticated using (public.sh_role() is not null)', t);
+    execute format('create policy sh_insert on public.%I for insert to authenticated with check (public.sh_role() in (''admin'',''manager'',''developer''))', t);
+    execute format('create policy sh_update on public.%I for update to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
+    execute format('create policy sh_delete on public.%I for delete to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
+  end loop;
+
+  -- Tabelas em que qualquer perfil ativo grava (chamados, comentários, favoritos, notificações)
+  foreach t in array array['tickets','ticket_events','favorites','recent_access','notifications'] loop
+    execute format('create policy sh_select on public.%I for select to authenticated using (public.sh_role() is not null)', t);
+    execute format('create policy sh_insert on public.%I for insert to authenticated with check (public.sh_role() is not null)', t);
+    execute format('create policy sh_update on public.%I for update to authenticated using (public.sh_role() is not null)', t);
+    execute format('create policy sh_delete on public.%I for delete to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
+  end loop;
+end $$;
+
+-- Auditoria: todos registram, ninguém altera ou apaga
+create policy sh_select on public.audit_logs for select to authenticated using (public.sh_role() is not null);
+create policy sh_insert on public.audit_logs for insert to authenticated with check (public.sh_role() is not null);
+
+-- Usuários: leitura pela equipe; cada pessoa vê o próprio perfil; somente admin cria e exclui
+create policy sh_select on public.users for select to authenticated using (
+  public.sh_role() is not null or auth_id = auth.uid()
+  or (auth_id is null and lower(email) = lower(auth.jwt() ->> 'email')));
+create policy sh_insert on public.users for insert to authenticated with check (
+  public.sh_role() = 'admin' or (not public.sh_has_users() and auth_id = auth.uid() and role = 'admin'));
+create policy sh_update on public.users for update to authenticated using (
+  public.sh_role() = 'admin' or auth_id = auth.uid()
+  or (auth_id is null and lower(email) = lower(auth.jwt() ->> 'email')));
+create policy sh_delete on public.users for delete to authenticated using (public.sh_role() = 'admin');
+
+-- Formulário público: visitantes (sem login) só podem CRIAR chamados novos
+create policy sh_public_insert on public.tickets for insert to anon with check (
+  source = 'public' and status = 'backlog' and assignee_id is null and reporter_id is null);
+`;
+
+// ---------- sessão do Supabase Auth ----------
+function sbSession() {
+  try {
+    return JSON.parse(localStorage.getItem(SB_SESSION_KEY) ?? 'null');
+  } catch {
+    return null;
+  }
+}
+function sbStoreSession(d) {
+  localStorage.setItem(SB_SESSION_KEY, JSON.stringify({
+    access_token: d.access_token,
+    refresh_token: d.refresh_token,
+    expires_at: Date.now() + ((d.expires_in ?? 3600) - 60) * 1000,
+    auth_id: d.user?.id,
+    email: d.user?.email,
+  }));
+}
+const sbClearSession = () => localStorage.removeItem(SB_SESSION_KEY);
+
+function sbErrorMessage(status, d) {
+  const raw = d?.msg || d?.message || d?.error_description || d?.error || `Erro ${status} no Supabase`;
+  const code = d?.code ?? '';
+  if (/Invalid login credentials/i.test(raw)) return 'E-mail ou senha inválidos';
+  if (/Email not confirmed/i.test(raw)) return 'E-mail ainda não confirmado. Abra o link enviado por e-mail ou desative "Confirm email" no Supabase (Authentication → Sign In / Providers → Email).';
+  if (/already registered|already been registered/i.test(raw)) return 'Este e-mail já tem cadastro no Supabase.';
+  if (code === '42P01' || code === 'PGRST205' || /does not exist|Could not find the table/i.test(raw)) return 'As tabelas do SystemHub não existem no Supabase. Execute o script de instalação (Configurações → Script SQL).';
+  if (code === '42501' || /row-level security/i.test(raw)) return 'Permissão negada pelo Supabase (regras de segurança/RLS).';
+  if (/Invalid API key|No API key/i.test(raw)) return 'Chave do Supabase inválida. Confira a "anon public key" em Configurações.';
+  return raw;
+}
+
+async function sbFetch(path, { method = 'GET', body, headers = {}, anon = false } = {}) {
+  const { supabaseUrl, supabaseKey } = getConfig();
+  if (!supabaseUrl) throw new Error('Supabase não configurado');
+  const token = anon ? null : await sbAccessToken();
+  let res;
+  try {
+    res = await fetch(`${supabaseUrl}${path}`, {
+      method,
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${token ?? supabaseKey}`, 'Content-Type': 'application/json', ...headers },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new Error('Não foi possível conectar ao Supabase. Verifique a URL do projeto e sua internet.');
+  }
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = { message: text };
+  }
+  if (!res.ok) {
+    const err = new Error(sbErrorMessage(res.status, data));
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+async function sbAccessToken() {
+  const s = sbSession();
+  if (!s) return null;
+  if (Date.now() < s.expires_at) return s.access_token;
+  try {
+    const d = await sbFetch('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: s.refresh_token }, anon: true });
+    sbStoreSession(d);
+    return d.access_token;
+  } catch {
+    sbClearSession();
+    return null;
+  }
+}
+
+async function sbSignIn(email, password) {
+  const d = await sbFetch('/auth/v1/token?grant_type=password', { method: 'POST', body: { email, password }, anon: true });
+  sbStoreSession(d);
+  return d;
+}
+async function sbSignUp(email, password) {
+  const d = await sbFetch('/auth/v1/signup', { method: 'POST', body: { email, password }, anon: true });
+  return d.user ?? d; // com confirmação de e-mail ativa o retorno é o próprio usuário
+}
+async function sbSignOut() {
+  try {
+    await sbFetch('/auth/v1/logout', { method: 'POST' });
+  } catch {
+    /* sessão já expirada */
+  }
+  sbClearSession();
+}
+const sbRpc = (fn, body = {}, anon = false) => sbFetch(`/rest/v1/rpc/${fn}`, { method: 'POST', body, anon });
+
+// ---------- leitura e sincronização ----------
+let sbSnapshot = {};
+
+async function sbSelectAll(table) {
+  const rows = [];
+  for (let offset = 0; ; offset += 1000) {
+    const page = await sbFetch(`/rest/v1/${table}?select=*&order=id.asc&limit=1000&offset=${offset}`);
+    rows.push(...page);
+    if (page.length < 1000) break;
+  }
+  return rows;
+}
+
+function sbTakeSnapshot() {
+  sbSnapshot = {};
+  for (const t of TABLES) sbSnapshot[t] = new Map(DB[t].map((r) => [r.id, JSON.stringify(r)]));
+}
+
+/** Recarrega todos os dados do Supabase. */
+async function sbReload() {
+  const results = await Promise.all(TABLES.map((t) => sbSelectAll(t)));
+  const d = emptyDb();
+  TABLES.forEach((t, i) => (d[t] = results[i]));
+  DB = migrateDb(d);
+  sbTakeSnapshot();
+}
+
+const sbRow = (table, r) => Object.fromEntries(SB_COLUMNS[table].map((c) => [c, r[c] === undefined ? null : r[c]]));
+const chunk = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
+
+/** Envia ao Supabase o que mudou desde a última sincronização (inclusões, alterações e exclusões). */
+async function sbPush() {
+  for (const t of TABLES) {
+    const prev = sbSnapshot[t] ?? new Map();
+    const cur = new Map(DB[t].map((r) => [r.id, JSON.stringify(r)]));
+    const upserts = [];
+    for (const [id, json] of cur) if (prev.get(id) !== json) upserts.push(sbRow(t, JSON.parse(json)));
+    const deletes = [...prev.keys()].filter((id) => !cur.has(id));
+    for (const part of chunk(upserts, 500)) {
+      await sbFetch(`/rest/v1/${t}?on_conflict=id`, { method: 'POST', body: part, headers: { Prefer: 'resolution=merge-duplicates,return=minimal' } });
+    }
+    for (const part of chunk(deletes, 150)) {
+      await sbFetch(`/rest/v1/${t}?id=in.(${part.join(',')})`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+    }
+    sbSnapshot[t] = cur;
+  }
+}
+
+let syncChain = Promise.resolve();
+let syncError = null;
+function scheduleSync() {
+  syncChain = syncChain.then(sbPush).catch((err) => {
+    syncError = err;
+  });
+  return syncChain;
+}
+
+/** Aguarda a sincronização; se o Supabase recusar, recarrega os dados e informa o erro. */
+async function flushSync() {
+  await scheduleSync();
+  if (syncError) {
+    const err = syncError;
+    syncError = null;
+    await sbReload().catch(() => undefined);
+    throw err;
+  }
+}
 
 // ===================== api =====================
 // =====================================================================
@@ -905,6 +1380,11 @@ async function resetDb() {
     'people:manage': ['admin', 'manager'],
     'users:manage': ['admin'],
     'audit:view': ['admin', 'manager'],
+    'clients:view': ['admin', 'manager', 'developer'],
+    'clients:manage': ['admin', 'manager'],
+    'backups:view': ['admin', 'manager', 'developer'],
+    'backups:manage': ['admin', 'developer'],
+    'settings:manage': ['admin'],
   };
   const allowed = (user, perm) => !!user && PERMISSIONS[perm].includes(user.role);
   const permissionsFor = (role) => Object.keys(PERMISSIONS).filter((p) => PERMISSIONS[p].includes(role));
@@ -912,7 +1392,14 @@ async function resetDb() {
 
   // ---------- sessão ----------
   const SESSION_KEY = 'systemhub-session';
+  const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, role: u.role });
   function sessionUser() {
+    if (isRemote()) {
+      const s = sbSession();
+      if (!s) return null;
+      const u = DB.users.find((x) => x.auth_id === s.auth_id && x.active);
+      return u ? publicUser(u) : null;
+    }
     try {
       const s = JSON.parse(localStorage.getItem(SESSION_KEY) ?? 'null');
       if (!s || s.exp < Date.now()) return null;
@@ -1118,6 +1605,13 @@ async function resetDb() {
   let running = false;
   async function runAllChecks() {
     if (running) return;
+    const user = sessionUser();
+    if (!allowed(user, 'monitoring:run')) return; // apenas admin/dev executam as verificações
+    if (isRemote()) {
+      // com vários navegadores abertos, evita verificações duplicadas
+      const last = DB.systems.map((s) => s.last_check_at).filter(Boolean).sort().at(-1);
+      if (last && Date.now() - Date.parse(last) < 4 * 60_000) return;
+    }
     running = true;
     try {
       const list = DB.systems.filter((s) => s.monitoring_enabled && (s.data_origin === 'demo' || s.healthcheck_url));
@@ -1197,11 +1691,15 @@ async function resetDb() {
       DB[t] = DB[t].filter((r) => r.system_id !== id);
     }
     for (const t of DB.tickets) if (t.system_id === id) t.system_id = null;
+    const jobs = new Set(DB.backup_jobs.filter((j) => j.system_id === id).map((j) => j.id));
+    DB.backup_jobs = DB.backup_jobs.filter((j) => !jobs.has(j.id));
+    DB.backup_runs = DB.backup_runs.filter((r) => !jobs.has(r.job_id));
+    for (const c of DB.clients) if ((c.system_ids ?? []).includes(id)) c.system_ids = c.system_ids.filter((x) => x !== id);
   }
 
   // ---------- chamados ----------
   const T_STATUSES = ['backlog', 'analysis', 'development', 'testing', 'done'];
-  const T_TYPES = ['bug', 'improvement', 'feature', 'update_issue', 'incident'];
+  const T_TYPES = ['question', 'bug', 'improvement', 'feature', 'update_issue', 'incident'];
   const T_PRIOS = ['low', 'medium', 'high', 'urgent'];
   const T_LABEL = { backlog: 'Backlog', analysis: 'Em análise', development: 'Em desenvolvimento', testing: 'Em testes', done: 'Concluído' };
   const ticketScope = (user, t) => allowed(user, 'tickets:manage') || t.reporter_id === user.id;
@@ -1209,9 +1707,21 @@ async function resetDb() {
     const s = t.system_id ? byId('systems', t.system_id) : null;
     return {
       ...t, system_name: s?.name ?? null, system_icon: s?.icon ?? null, system_color: s?.color ?? null,
-      assignee_name: nameOf('users', t.assignee_id), reporter_name: nameOf('users', t.reporter_id),
+      assignee_name: nameOf('users', t.assignee_id), reporter_name: nameOf('users', t.reporter_id) ?? t.requester_name ?? null,
+      client_name: nameOf('clients', t.client_id),
       comments: DB.ticket_events.filter((e) => e.ticket_id === t.id && e.kind === 'comment').length,
     };
+  }
+  const setting = (key) => DB.settings.find((s) => s.key === key)?.value ?? '';
+  function setSetting(key, value) {
+    const s = DB.settings.find((x) => x.key === key);
+    if (s) s.value = value;
+    else insert('settings', { key, value });
+  }
+  /** Tenta vincular um chamado público a um cliente cadastrado (mesmo e-mail ou WhatsApp). */
+  function matchClient(email, phone) {
+    const digits = (v) => String(v ?? '').replace(/\D/g, '').slice(-9);
+    return DB.clients.find((c) => (email && c.email && c.email.toLowerCase() === email.toLowerCase()) || (phone && digits(c.phone) && digits(c.phone) === digits(phone)))?.id ?? null;
   }
   function loadTicket(user, id) {
     const t = byId('tickets', id);
@@ -1230,6 +1740,12 @@ async function resetDb() {
       priority: v.oneOf('priority', T_PRIOS) ?? 'medium',
       status: v.oneOf('status', T_STATUSES) ?? 'backlog',
       due_date: v.date('due_date') ?? null,
+      client_id: v.id('client_id') ?? null,
+      requester_name: v.str('requester_name', { max: 120 }) ?? null,
+      requester_phone: v.str('requester_phone', { max: 30 }) ?? null,
+      requester_email: v.email('requester_email') ?? null,
+      requester_company: v.str('requester_company', { max: 120 }) ?? null,
+      resolution: v.str('resolution', { max: 5000, trim: false }) ?? null,
     };
     v.done();
     return d;
@@ -1254,6 +1770,35 @@ async function resetDb() {
     v.done();
     const a = attempts.get(email);
     if (a && a.count >= 8 && a.until > Date.now()) fail(429, 'Muitas tentativas. Tente novamente em alguns minutos.');
+
+    if (isRemote()) {
+      // Login pelo Supabase Auth; o perfil (papel) fica na tabela users
+      let s;
+      try {
+        s = await sbSignIn(email, password);
+      } catch (err) {
+        attempts.set(email, { count: (a?.count ?? 0) + 1, until: Date.now() + 10 * 60_000 });
+        fail(err.status === 400 ? 401 : err.status ?? 500, err.message);
+      }
+      await sbReload();
+      let u = DB.users.find((x) => x.auth_id === s.user.id) ?? DB.users.find((x) => !x.auth_id && x.email === email);
+      if (!u && !(await sbRpc('sh_has_users'))) {
+        // primeiro acesso ao Supabase: esta conta vira o administrador
+        u = insert('users', { auth_id: s.user.id, name: email.split('@')[0], email, role: 'admin', active: true, is_demo: false, password_hash: null, created_at: nowIso(), last_login_at: null });
+        await flushSync();
+      }
+      if (!u || !u.active) {
+        await sbSignOut();
+        fail(403, 'Seu login existe, mas não há um perfil ativo no SystemHub. Peça a um administrador para cadastrar você em Usuários e acessos.');
+      }
+      u.auth_id = s.user.id; // vincula perfil pré-cadastrado pelo administrador
+      u.last_login_at = nowIso();
+      attempts.delete(email);
+      const user = publicUser(u);
+      audit(user, 'auth.login', 'user', u.id, `Login de ${u.email}`);
+      return { user, permissions: permissionsFor(u.role) };
+    }
+
     const u = DB.users.find((x) => x.email === email);
     if (!u || !u.active || !(await verifyPassword(password, u.password_hash))) {
       attempts.set(email, { count: (a?.count ?? 0) + 1, until: Date.now() + 10 * 60_000 });
@@ -1266,7 +1811,134 @@ async function resetDb() {
     audit(user, 'auth.login', 'user', u.id, `Login de ${u.email}`);
     return { user, permissions: permissionsFor(u.role) };
   }, { pub: true });
-  on('POST', '/auth/logout', () => { localStorage.removeItem(SESSION_KEY); return { ok: true }; }, { pub: true });
+  on('POST', '/auth/logout', async () => {
+    localStorage.removeItem(SESSION_KEY);
+    if (isRemote()) {
+      await sbSignOut();
+      DB = emptyDb();
+      sbTakeSnapshot();
+    }
+    return { ok: true };
+  }, { pub: true });
+
+  // ---- configuração e situação da conexão ----
+  on('GET', '/config', () => {
+    const c = getConfig();
+    return { mode: c.remote ? 'supabase' : 'local', supabaseUrl: c.supabaseUrl, hasKey: !!c.supabaseKey, fixed: c.fixed, sql: SUPABASE_SETUP_SQL };
+  }, { pub: true });
+
+  /** Salva a URL/chave do Supabase. Só o administrador (ou ninguém logado ainda) pode trocar. */
+  on('PUT', '/config', async ({ body }) => {
+    const user = sessionUser();
+    if (user && !allowed(user, 'settings:manage')) fail(403, 'Somente administradores alteram a conexão.');
+    if (getConfig().fixed) fail(400, 'A conexão está fixada no arquivo script.js (SUPABASE_URL / SUPABASE_ANON_KEY).');
+    const url = String(body.supabaseUrl ?? '').trim().replace(/\/+$/, '');
+    const key = String(body.supabaseKey ?? '').trim();
+    if (url && !/^https:\/\/[\w.-]+$/i.test(url)) fail(400, 'URL do projeto inválida. Ex.: https://abcdefgh.supabase.co');
+    if (url && !key) fail(400, 'Informe a chave "anon public" do projeto.');
+    localStorage.removeItem(SESSION_KEY);
+    sbClearSession();
+    saveConfig(url ? { supabaseUrl: url, supabaseKey: key } : {});
+    ready = null; // recarrega o banco no novo modo
+    return { ok: true, mode: url ? 'supabase' : 'local' };
+  }, { pub: true });
+
+  /** Testa a conexão e verifica se as tabelas foram instaladas. */
+  on('POST', '/config/test', async ({ body }) => {
+    const prev = configOverride;
+    configOverride = { supabaseUrl: body.supabaseUrl, supabaseKey: body.supabaseKey };
+    try {
+      await sbFetch('/rest/v1/public_systems?select=id&limit=1', { anon: true });
+      const hasUsers = await sbRpc('sh_has_users', {}, true);
+      return { ok: true, installed: true, hasUsers };
+    } catch (err) {
+      fail(400, err.message);
+    } finally {
+      configOverride = prev;
+    }
+  }, { pub: true });
+
+  /** Cria a conta de login (Supabase Auth) do primeiro administrador. */
+  on('POST', '/config/first-admin', async ({ body }) => {
+    if (!isRemote()) fail(400, 'Conecte o Supabase primeiro.');
+    const v = validator(body);
+    const email = v.email('email', { required: true, label: 'E-mail' });
+    const password = v.str('password', { min: 8, max: 200, required: true, label: 'Senha', trim: false });
+    v.done();
+    if (await sbRpc('sh_has_users', {}, true)) fail(400, 'Já existe administrador. Entre com seu login ou peça acesso a ele.');
+    await sbSignUp(email, password);
+    return { ok: true };
+  }, { pub: true });
+
+  // ---- formulário público de chamados (sem login) ----
+  on('GET', '/public/systems', async () => {
+    if (isRemote()) return sbFetch('/rest/v1/public_systems?select=id,name', { anon: true });
+    return DB.systems.filter((s) => !s.restricted).map((s) => ({ id: s.id, name: s.name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, { pub: true });
+
+  on('POST', '/public/tickets', async ({ body }) => {
+    const v = validator(body);
+    const d = {
+      requester_name: v.str('requester_name', { min: 2, max: 120, required: true, label: 'Seu nome' }),
+      requester_phone: v.str('requester_phone', { min: 8, max: 30, required: true, label: 'WhatsApp' }),
+      requester_email: v.email('requester_email') ?? null,
+      requester_company: v.str('requester_company', { max: 120 }) ?? null,
+      type: v.oneOf('type', T_TYPES, { required: true, label: 'Tipo' }),
+      system_id: v.id('system_id') ?? null,
+      title: v.str('title', { min: 3, max: 200, required: true, label: 'Assunto' }),
+      description: v.str('description', { min: 5, max: 5000, required: true, label: 'Descrição', trim: false }),
+    };
+    v.done();
+    if (String(d.requester_phone).replace(/\D/g, '').length < 10) fail(400, 'Informe o WhatsApp com DDD.');
+    const row = {
+      ...d, priority: d.type === 'incident' ? 'high' : 'medium', status: 'backlog', assignee_id: null, reporter_id: null, due_date: null,
+      position: 0, is_demo: false, created_at: nowIso(), updated_at: nowIso(), closed_at: null, source: 'public', resolution: null, client_id: null,
+    };
+    if (isRemote()) {
+      // visitante sem login: grava direto no Supabase (o banco só permite criar chamados públicos)
+      const id = 10_000_000 + Math.floor(Math.random() * 89_999_999);
+      await sbFetch('/rest/v1/tickets', { method: 'POST', body: sbRow('tickets', { id, ...row }), anon: true, headers: { Prefer: 'return=minimal' } });
+      return { id };
+    }
+    row.client_id = matchClient(d.requester_email, d.requester_phone);
+    const t = insert('tickets', row);
+    event(t.id, null, 'created', `Chamado aberto pelo formulário público por ${d.requester_name}`);
+    notifyRoles(['admin', 'manager', 'developer'], { type: 'ticket', title: `Novo chamado pelo link público: ${d.title}`, message: d.requester_name, link: `/tickets?open=${t.id}` });
+    return { id: t.id };
+  }, { pub: true });
+
+  // ---- configurações gerais (WhatsApp do responsável, endereço público) ----
+  on('GET', '/settings', () => ({ owner_whatsapp: setting('owner_whatsapp'), public_url: setting('public_url') }));
+  on('PUT', '/settings', ({ user, body }) => {
+    need(user, 'settings:manage');
+    const v = validator(body);
+    const phone = v.str('owner_whatsapp', { max: 30 }) ?? '';
+    const url = v.url('public_url', { label: 'Endereço público' }) ?? '';
+    v.done();
+    if (phone && phone.replace(/\D/g, '').length < 10) fail(400, 'Informe o WhatsApp com DDD.');
+    setSetting('owner_whatsapp', phone);
+    setSetting('public_url', url);
+    audit(user, 'settings.update', 'settings', null, 'Configurações gerais atualizadas', { owner_whatsapp: phone ? '***' : '', public_url: url });
+    return { ok: true };
+  });
+
+  /** Carrega os dados demonstrativos no banco atual. */
+  on('POST', '/settings/demo-data', async ({ user }) => {
+    need(user, 'settings:manage');
+    if (DB.systems.some((s) => s.is_demo || s.data_origin === 'demo')) fail(400, 'Os dados demonstrativos já foram carregados.');
+    await seedDemo({ merge: true });
+    audit(user, 'seed', 'system', null, 'Dados demonstrativos (fictícios) carregados');
+    return { ok: true };
+  });
+
+  /** Modo local: apaga tudo e recria a demonstração. */
+  on('POST', '/settings/reset-local', async ({ user }) => {
+    need(user, 'settings:manage');
+    if (isRemote()) fail(400, 'Disponível apenas no modo local.');
+    localStorage.removeItem(SESSION_KEY);
+    await resetDb();
+    return { ok: true };
+  });
   on('GET', '/auth/me', () => { const user = sessionUser(); return { user, permissions: user ? permissionsFor(user.role) : [] }; }, { pub: true });
 
   // ---- dashboard ----
@@ -1290,7 +1962,11 @@ async function resetDb() {
         problems: tk.filter((t) => ['bug', 'incident', 'update_issue'].includes(t.type)).length,
         overdue: tk.filter((t) => t.due_date && t.due_date < today).length,
         urgent: tk.filter((t) => t.priority === 'urgent').length,
+        public_open: tk.filter((t) => t.source === 'public').length,
       },
+      backups: allowed(user, 'backups:view')
+        ? DB.backup_jobs.reduce((acc, j) => { const h = backupHealth(j); if (h === 'late' || h === 'failed') acc[h]++; return acc; }, { late: 0, failed: 0 })
+        : null,
       categories: groupBy('category').sort((a, b) => b.value - a.value || a.name.localeCompare(b.name)),
       origin: groupBy('data_origin'),
       availability: dailyAvailability(30, visIds),
@@ -1485,8 +2161,38 @@ async function resetDb() {
     if (query.q) { const toks = tokens(query.q); list = list.filter((t) => matches(`${t.title} ${t.description} ${t.system_name ?? ''} #${t.id}`, toks)); }
     for (const k of ['type', 'priority', 'status']) if (query[k]) list = list.filter((t) => t[k] === query[k]);
     if (query.system) list = list.filter((t) => t.system_id === Number(query.system));
+    if (query.client) list = list.filter((t) => t.client_id === Number(query.client));
+    if (query.source) list = list.filter((t) => t.source === query.source);
     if (query.assignee) list = list.filter((t) => t.assignee_id === (query.assignee === 'me' ? user.id : Number(query.assignee)));
     return list.sort((a, b) => a.position - b.position || b.id - a.id);
+  });
+
+  /** Conclui o chamado com o resumo da solução (usado no resumo enviado pelo WhatsApp). */
+  on('POST', '/tickets/:id/conclude', ({ user, params, body }) => {
+    need(user, 'tickets:manage');
+    const t = loadTicket(user, intId(params.id));
+    const v = validator(body);
+    const resolution = v.str('resolution', { min: 3, max: 5000, required: true, label: 'Resumo da solução', trim: false });
+    v.done();
+    const prev = t.status;
+    if (prev !== 'done') {
+      const pos = Math.min(1000, ...DB.tickets.filter((x) => x.status === 'done').map((x) => x.position));
+      Object.assign(t, { status: 'done', position: pos - 1, closed_at: nowIso() });
+      event(t.id, user.id, 'status', `Status: ${T_LABEL[prev]} → Concluído`);
+    }
+    Object.assign(t, { resolution, updated_at: nowIso(), assignee_id: t.assignee_id ?? user.id });
+    event(t.id, user.id, 'resolution', `Resumo da solução: ${resolution}`);
+    audit(user, 'ticket.conclude', 'ticket', t.id, `Chamado #${t.id} concluído`, { from: prev });
+    if (t.reporter_id && t.reporter_id !== user.id) notifyUsers([t.reporter_id], { type: 'ticket', title: `Chamado #${t.id}: Concluído`, message: t.title, link: `/tickets?open=${t.id}` });
+    return { ok: true };
+  });
+
+  /** Registra no histórico que o resumo foi enviado pelo WhatsApp. */
+  on('POST', '/tickets/:id/whatsapp-log', ({ user, params, body }) => {
+    const t = loadTicket(user, intId(params.id));
+    const to = body.to === 'owner' ? 'responsável (você)' : 'solicitante';
+    event(t.id, user.id, 'whatsapp', `Resumo aberto no WhatsApp para envio ao ${to}`);
+    return { ok: true, owner_whatsapp: setting('owner_whatsapp') };
   });
 
   on('GET', '/tickets/:id', ({ user, params }) => {
@@ -1504,7 +2210,8 @@ async function resetDb() {
     if (d.system_id) visibleSystem(user, d.system_id);
     if (!allowed(user, 'tickets:manage')) { d.assignee_id = null; d.status = 'backlog'; } // triagem é da equipe
     const minPos = Math.min(1000, ...DB.tickets.filter((t) => t.status === d.status).map((t) => t.position));
-    const t = insert('tickets', { ...d, reporter_id: user.id, position: minPos - 1, is_demo: false, created_at: nowIso(), updated_at: nowIso(), closed_at: d.status === 'done' ? nowIso() : null });
+    if (!d.client_id && (d.requester_email || d.requester_phone)) d.client_id = matchClient(d.requester_email, d.requester_phone);
+    const t = insert('tickets', { ...d, source: 'internal', reporter_id: user.id, position: minPos - 1, is_demo: false, created_at: nowIso(), updated_at: nowIso(), closed_at: d.status === 'done' ? nowIso() : null });
     event(t.id, user.id, 'created', `Chamado aberto em "${T_LABEL[d.status]}"`);
     audit(user, 'ticket.create', 'ticket', t.id, `Chamado #${t.id} aberto: ${d.title}`);
     if (d.assignee_id && d.assignee_id !== user.id) notifyUsers([d.assignee_id], { type: 'ticket', title: `Chamado #${t.id} atribuído a você`, message: d.title, link: `/tickets?open=${t.id}` });
@@ -1515,7 +2222,9 @@ async function resetDb() {
     need(user, 'tickets:manage');
     const t = loadTicket(user, intId(params.id));
     const d = parseTicket(body);
-    const labels = { title: 'Título', description: 'Descrição', type: 'Tipo', system_id: 'Sistema', assignee_id: 'Responsável', priority: 'Prioridade', status: 'Status', due_date: 'Prazo' };
+    // campos não enviados pelo formulário de edição são preservados
+    for (const k of ['client_id', 'requester_name', 'requester_phone', 'requester_email', 'requester_company', 'resolution']) if (body[k] === undefined) d[k] = t[k] ?? null;
+    const labels = { title: 'Título', description: 'Descrição', type: 'Tipo', system_id: 'Sistema', assignee_id: 'Responsável', priority: 'Prioridade', status: 'Status', due_date: 'Prazo', client_id: 'Cliente' };
     const changed = Object.keys(labels).filter((k) => (t[k] ?? null) !== (d[k] ?? null));
     const before = { ...t };
     Object.assign(t, d, { updated_at: nowIso(), closed_at: d.status === 'done' ? t.closed_at ?? nowIso() : null });
@@ -1648,6 +2357,7 @@ async function resetDb() {
     DB.people = DB.people.filter((x) => x.id !== p.id);
     DB.system_contacts = DB.system_contacts.filter((c) => c.person_id !== p.id);
     for (const s of DB.systems) if (s.technical_owner_id === p.id) s.technical_owner_id = null;
+    for (const j of DB.backup_jobs) if (j.responsible_id === p.id) j.responsible_id = null;
     audit(user, 'person.delete', 'person', p.id, `Responsável "${p.name}" excluído`);
     return { ok: true };
   });
@@ -1659,7 +2369,7 @@ async function resetDb() {
   });
   on('GET', '/users', ({ user }) => {
     need(user, 'users:manage');
-    return DB.users.map(({ password_hash, ...u }) => ({ ...u, system_ids: DB.system_access.filter((a) => a.user_id === u.id).map((a) => a.system_id) }))
+    return DB.users.map(({ password_hash, auth_id, ...u }) => ({ ...u, has_login: !isRemote() || !!auth_id, system_ids: DB.system_access.filter((a) => a.user_id === u.id).map((a) => a.system_id) }))
       .sort((a, b) => a.name.localeCompare(b.name));
   });
   const parseUser = (body, creating) => {
@@ -1681,9 +2391,21 @@ async function resetDb() {
   };
   on('POST', '/users', async ({ user, body }) => {
     need(user, 'users:manage');
-    const { d, systemIds } = parseUser(body, true);
+    const { d, systemIds } = parseUser(body, !isRemote());
     if (DB.users.some((u) => u.email === d.email)) fail(409, 'Já existe um usuário com este e-mail');
-    const u = insert('users', { name: d.name, email: d.email, role: d.role, active: d.active, password_hash: await hashPassword(d.password), is_demo: false, created_at: nowIso(), last_login_at: null });
+    let authId = null;
+    if (isRemote() && d.password) {
+      // cria o login no Supabase Auth; se já existir, o perfil é vinculado no primeiro acesso
+      try {
+        authId = (await sbSignUp(d.email, d.password))?.id ?? null;
+      } catch (err) {
+        if (!/já tem cadastro/.test(err.message)) fail(400, err.message);
+      }
+    }
+    const u = insert('users', {
+      name: d.name, email: d.email, role: d.role, active: d.active, auth_id: authId, is_demo: false, created_at: nowIso(), last_login_at: null,
+      password_hash: isRemote() ? null : await hashPassword(d.password),
+    });
     setAccess(u.id, systemIds);
     audit(user, 'user.create', 'user', u.id, `Usuário ${d.email} criado com perfil ${d.role}`);
     return { id: u.id };
@@ -1696,7 +2418,11 @@ async function resetDb() {
     if (DB.users.some((x) => x.id !== u.id && x.email === d.email)) fail(409, 'Já existe um usuário com este e-mail');
     const changes = diff(u, d, ['name', 'email', 'role', 'active']);
     Object.assign(u, { name: d.name, email: d.email, role: d.role, active: d.active });
-    if (d.password) { u.password_hash = await hashPassword(d.password); changes.password = { from: '***', to: '***' }; }
+    if (d.password) {
+      if (isRemote()) fail(400, 'No modo Supabase a senha é redefinida pela própria pessoa ou no painel do Supabase (Authentication → Users).');
+      u.password_hash = await hashPassword(d.password);
+      changes.password = { from: '***', to: '***' };
+    }
     setAccess(u.id, systemIds);
     audit(user, 'user.update', 'user', u.id, `Usuário ${d.email} atualizado`, changes);
     return { ok: true };
@@ -1774,6 +2500,207 @@ async function resetDb() {
     return { ok: true };
   });
 
+  // ---- clientes ----
+  const onlyDigits = (v) => String(v ?? '').replace(/\D/g, '');
+  function parseClient(body) {
+    const v = validator(body);
+    const d = {
+      name: v.str('name', { min: 2, max: 160, required: true, label: 'Nome / razão social' }),
+      kind: v.oneOf('kind', ['PJ', 'PF']) ?? 'PJ',
+      document: v.str('document', { max: 20 }) ?? null,
+      contact_name: v.str('contact_name', { max: 120 }) ?? null,
+      email: v.email('email') ?? null,
+      phone: v.str('phone', { max: 30 }) ?? null,
+      city: v.str('city', { max: 80 }) ?? null,
+      state: v.str('state', { max: 2 }) ?? null,
+      status: v.oneOf('status', ['active', 'inactive']) ?? 'active',
+      notes: v.str('notes', { max: 4000, trim: false }) ?? null,
+      system_ids: Array.isArray(body.system_ids) ? [...new Set(body.system_ids.map((x) => intId(x, 'sistema')))] : [],
+    };
+    v.done();
+    if (d.document) {
+      const n = onlyDigits(d.document).length;
+      if (d.kind === 'PJ' && n !== 14) fail(400, 'CNPJ deve ter 14 dígitos.');
+      if (d.kind === 'PF' && n !== 11) fail(400, 'CPF deve ter 11 dígitos.');
+    }
+    if (d.phone && onlyDigits(d.phone).length < 10) fail(400, 'Informe o telefone/WhatsApp com DDD.');
+    if (d.state) d.state = d.state.toUpperCase();
+    return d;
+  }
+  const clientView = (c) => {
+    const tk = DB.tickets.filter((t) => t.client_id === c.id);
+    return {
+      ...c, systems: (c.system_ids ?? []).map((id) => ({ id, name: nameOf('systems', id) })).filter((s) => s.name),
+      tickets_total: tk.length, tickets_open: tk.filter((t) => t.status !== 'done').length,
+      last_ticket_at: tk.map((t) => t.created_at).sort().at(-1) ?? null,
+    };
+  };
+  on('GET', '/clients', ({ user, query }) => {
+    need(user, 'clients:view');
+    let list = DB.clients.map(clientView);
+    if (query.q) { const toks = tokens(query.q); list = list.filter((c) => matches(`${c.name} ${c.document ?? ''} ${onlyDigits(c.document)} ${c.contact_name ?? ''} ${c.email ?? ''} ${c.phone ?? ''} ${c.city ?? ''}`, toks)); }
+    if (query.status) list = list.filter((c) => c.status === query.status);
+    if (query.system) list = list.filter((c) => (c.system_ids ?? []).includes(Number(query.system)));
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  });
+  on('GET', '/clients/:id', ({ user, params }) => {
+    need(user, 'clients:view');
+    const c = byId('clients', intId(params.id)) ?? notFound('Cliente');
+    return {
+      ...clientView(c),
+      tickets: DB.tickets.filter((t) => t.client_id === c.id).map(ticketView).sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    };
+  });
+  on('POST', '/clients', ({ user, body }) => {
+    need(user, 'clients:manage');
+    const d = parseClient(body);
+    if (d.document && DB.clients.some((c) => onlyDigits(c.document) === onlyDigits(d.document))) fail(409, 'Já existe um cliente com este CPF/CNPJ.');
+    const c = insert('clients', { ...d, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    audit(user, 'client.create', 'client', c.id, `Cliente "${d.name}" cadastrado`);
+    return { id: c.id };
+  });
+  on('PUT', '/clients/:id', ({ user, params, body }) => {
+    need(user, 'clients:manage');
+    const c = byId('clients', intId(params.id)) ?? notFound('Cliente');
+    const d = parseClient(body);
+    if (d.document && DB.clients.some((x) => x.id !== c.id && onlyDigits(x.document) === onlyDigits(d.document))) fail(409, 'Já existe um cliente com este CPF/CNPJ.');
+    const changes = diff(c, d, Object.keys(d));
+    Object.assign(c, d, { updated_at: nowIso() });
+    if (Object.keys(changes).length) audit(user, 'client.update', 'client', c.id, `Cliente "${d.name}" atualizado (${Object.keys(changes).join(', ')})`, changes);
+    return { ok: true };
+  });
+  on('DELETE', '/clients/:id', ({ user, params }) => {
+    need(user, 'clients:manage');
+    const c = byId('clients', intId(params.id)) ?? notFound('Cliente');
+    DB.clients = DB.clients.filter((x) => x.id !== c.id);
+    for (const t of DB.tickets) if (t.client_id === c.id) t.client_id = null;
+    audit(user, 'client.delete', 'client', c.id, `Cliente "${c.name}" excluído`);
+    return { ok: true };
+  });
+
+  // ---- backups ----
+  const BK_FREQ_HOURS = { hourly: 1, daily: 24, weekly: 168, monthly: 744 };
+  const BK_TYPES = ['full', 'incremental', 'differential', 'snapshot'];
+  /** Situação da rotina: ok, failed (última execução falhou), late (atrasada), never, inactive. */
+  function backupHealth(j) {
+    if (!j.active) return 'inactive';
+    if (j.last_status === 'failed') return 'failed';
+    if (!j.last_success_at) return j.last_run_at ? 'failed' : 'never';
+    const limit = BK_FREQ_HOURS[j.frequency] * HOUR * 1.5; // tolerância de 50%
+    return Date.now() - Date.parse(j.last_success_at) > limit ? 'late' : 'ok';
+  }
+  const nextRun = (j) => (j.last_run_at ? new Date(Date.parse(j.last_run_at) + BK_FREQ_HOURS[j.frequency] * HOUR).toISOString() : null);
+  const jobView = (j) => {
+    const s = byId('systems', j.system_id);
+    return {
+      ...j, health: backupHealth(j), next_run_at: nextRun(j), system_name: s?.name ?? null, system_icon: s?.icon ?? null, system_color: s?.color ?? null,
+      responsible_name: nameOf('people', j.responsible_id),
+      runs_30d: DB.backup_runs.filter((r) => r.job_id === j.id && r.started_at > agoIso(30 * DAY)).length,
+      failures_30d: DB.backup_runs.filter((r) => r.job_id === j.id && r.status === 'failed' && r.started_at > agoIso(30 * DAY)).length,
+    };
+  };
+  function parseJob(body) {
+    const v = validator(body);
+    const d = {
+      system_id: v.id('system_id'),
+      name: v.str('name', { min: 2, max: 120, required: true, label: 'Nome da rotina' }),
+      type: v.oneOf('type', BK_TYPES, { required: true, label: 'Tipo' }),
+      frequency: v.oneOf('frequency', Object.keys(BK_FREQ_HOURS), { required: true, label: 'Frequência' }),
+      schedule: v.str('schedule', { max: 120 }) ?? null,
+      destination: v.str('destination', { max: 200 }) ?? null,
+      responsible_id: v.id('responsible_id') ?? null,
+      active: v.bool('active') ?? true,
+      notes: v.str('notes', { max: 2000, trim: false }) ?? null,
+    };
+    const ret = Number(body.retention_days);
+    d.retention_days = body.retention_days === '' || body.retention_days == null ? null : Number.isInteger(ret) && ret > 0 && ret <= 3650 ? ret : fail(400, 'Retenção deve ser um número de dias entre 1 e 3650.');
+    v.done();
+    if (!d.system_id) fail(400, 'Selecione o sistema.');
+    if (!byId('systems', d.system_id)) notFound('Sistema');
+    return d;
+  }
+  on('GET', '/backups', ({ user, query }) => {
+    need(user, 'backups:view');
+    let list = DB.backup_jobs.map(jobView);
+    if (query.system) list = list.filter((j) => j.system_id === Number(query.system));
+    if (query.health) list = list.filter((j) => j.health === query.health);
+    if (query.q) { const toks = tokens(query.q); list = list.filter((j) => matches(`${j.name} ${j.system_name} ${j.destination ?? ''} ${j.responsible_name ?? ''}`, toks)); }
+    const rank = { failed: 0, late: 1, never: 2, ok: 3, inactive: 4 };
+    list.sort((a, b) => rank[a.health] - rank[b.health] || (a.system_name ?? '').localeCompare(b.system_name ?? ''));
+    const all = DB.backup_jobs.map(jobView);
+    const runs30 = DB.backup_runs.filter((r) => r.started_at > agoIso(30 * DAY));
+    return {
+      items: list,
+      summary: {
+        active: all.filter((j) => j.active).length, ok: all.filter((j) => j.health === 'ok').length,
+        late: all.filter((j) => j.health === 'late').length, failed: all.filter((j) => j.health === 'failed').length,
+        never: all.filter((j) => j.health === 'never').length,
+        success_rate_30d: runs30.length ? (runs30.filter((r) => r.status === 'success').length / runs30.length) * 100 : null,
+        systems_without_backup: DB.systems.filter((s) => !DB.backup_jobs.some((j) => j.system_id === s.id && j.active)).length,
+      },
+    };
+  });
+  on('GET', '/backups/:id', ({ user, params }) => {
+    need(user, 'backups:view');
+    const j = byId('backup_jobs', intId(params.id)) ?? notFound('Rotina de backup');
+    return {
+      ...jobView(j),
+      runs: DB.backup_runs.filter((r) => r.job_id === j.id).sort((a, b) => b.started_at.localeCompare(a.started_at)).slice(0, 100)
+        .map((r) => ({ ...r, created_by_name: nameOf('users', r.created_by) })),
+    };
+  });
+  on('POST', '/backups', ({ user, body }) => {
+    need(user, 'backups:manage');
+    const d = parseJob(body);
+    const j = insert('backup_jobs', { ...d, last_run_at: null, last_status: 'never', last_success_at: null, last_size_mb: null, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    audit(user, 'backup.create', 'system', d.system_id, `Rotina de backup "${d.name}" cadastrada`, { jobId: j.id });
+    return { id: j.id };
+  });
+  on('PUT', '/backups/:id', ({ user, params, body }) => {
+    need(user, 'backups:manage');
+    const j = byId('backup_jobs', intId(params.id)) ?? notFound('Rotina de backup');
+    const d = parseJob(body);
+    const changes = diff(j, d, Object.keys(d));
+    Object.assign(j, d, { updated_at: nowIso() });
+    if (Object.keys(changes).length) audit(user, 'backup.update', 'system', j.system_id, `Rotina de backup "${j.name}" atualizada (${Object.keys(changes).join(', ')})`, changes);
+    return { ok: true };
+  });
+  on('DELETE', '/backups/:id', ({ user, params }) => {
+    need(user, 'backups:manage');
+    const j = byId('backup_jobs', intId(params.id)) ?? notFound('Rotina de backup');
+    DB.backup_jobs = DB.backup_jobs.filter((x) => x.id !== j.id);
+    DB.backup_runs = DB.backup_runs.filter((r) => r.job_id !== j.id);
+    audit(user, 'backup.delete', 'system', j.system_id, `Rotina de backup "${j.name}" excluída`);
+    return { ok: true };
+  });
+  /** Registra uma execução de backup (informada manualmente pela equipe). */
+  on('POST', '/backups/:id/runs', ({ user, params, body }) => {
+    need(user, 'backups:manage');
+    const j = byId('backup_jobs', intId(params.id)) ?? notFound('Rotina de backup');
+    const v = validator(body);
+    const status = v.oneOf('status', ['success', 'failed'], { required: true, label: 'Resultado' });
+    const notes = v.str('notes', { max: 1000 }) ?? null;
+    v.done();
+    const finished = body.finished_at ? new Date(body.finished_at) : new Date();
+    if (Number.isNaN(finished.getTime()) || finished.getTime() > Date.now() + 60_000) fail(400, 'Data/hora de término inválida.');
+    const size = body.size_mb === '' || body.size_mb == null ? null : Number(body.size_mb);
+    if (size !== null && (!Number.isFinite(size) || size < 0)) fail(400, 'Tamanho inválido.');
+    const r = insert('backup_runs', {
+      job_id: j.id, started_at: finished.toISOString(), finished_at: finished.toISOString(), status, size_mb: size, notes, source: 'manual', created_by: user.id,
+    });
+    const latest = DB.backup_runs.filter((x) => x.job_id === j.id).sort((a, b) => a.finished_at.localeCompare(b.finished_at)).at(-1);
+    j.last_run_at = latest.finished_at;
+    j.last_status = latest.status;
+    if (status === 'success' && (!j.last_success_at || r.finished_at > j.last_success_at)) { j.last_success_at = r.finished_at; j.last_size_mb = size; }
+    j.updated_at = nowIso();
+    const s = byId('systems', j.system_id);
+    audit(user, 'backup.run', 'system', j.system_id, `Backup "${j.name}" registrado: ${status === 'success' ? 'sucesso' : 'falha'}`, { jobId: j.id, size_mb: size, notes });
+    if (status === 'failed') {
+      notifyRoles(['admin', 'manager', 'developer'], { type: 'incident', title: `Falha no backup "${j.name}" (${s?.name ?? 'sistema'})`, message: notes ?? undefined, link: '/backups' }, user.id);
+    }
+    return { id: r.id };
+  });
+
   // ---- notificações, auditoria e busca ----
   on('GET', '/notifications', ({ user }) => {
     const mine = DB.notifications.filter((n) => n.user_id === user.id);
@@ -1812,6 +2739,10 @@ async function resetDb() {
         .map((t) => ({ id: t.id, title: t.title, status: t.status, type: t.type })),
       people: DB.people.filter((p) => matches(`${p.name} ${p.email ?? ''} ${p.title ?? ''}`, toks)).slice(0, 5)
         .map((p) => ({ id: p.id, name: p.name, title: p.title, email: p.email })),
+      clients: allowed(user, 'clients:view')
+        ? DB.clients.filter((c) => matches(`${c.name} ${c.document ?? ''} ${onlyDigits(c.document)} ${c.contact_name ?? ''} ${c.email ?? ''}`, toks)).slice(0, 5)
+          .map((c) => ({ id: c.id, name: c.name, document: c.document, contact_name: c.contact_name }))
+        : [],
     };
   });
 
@@ -1822,8 +2753,15 @@ async function resetDb() {
   let onUnauthorized = () => {};
   const WRITE = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+  let inFlight = 0;
+  const CONFIG_ROUTES = new Set(['/config', '/config/test', '/config/first-admin']); // nunca gravam dados
+  const NO_REMOTE_SYNC = new Set(['/public/tickets', '/auth/logout']); // no Supabase já gravam por conta própria
+
   async function request(method, path, body, query) {
-    ready ??= initDb();
+    ready ??= initDb().catch((err) => {
+      ready = null;
+      throw err;
+    });
     await ready;
     const r = routes.find((x) => x.method === method && x.re.test(path));
     if (!r) throw new ApiError(404, 'Rota não encontrada');
@@ -1835,11 +2773,33 @@ async function resetDb() {
       throw new ApiError(401, 'Sessão expirada ou inválida');
     }
     const q = Object.fromEntries(Object.entries(query ?? {}).filter(([, v]) => v !== undefined && v !== null && v !== '').map(([k, v]) => [k, Array.isArray(v) ? v.join(',') : String(v)]));
+    inFlight++;
     try {
       const result = await r.handler({ user, params, query: q, body: clone(body ?? {}) });
+      if (WRITE.has(method) && !CONFIG_ROUTES.has(path)) {
+        if (!isRemote()) saveDb();
+        else if (!NO_REMOTE_SYNC.has(path)) await flushSync(); // grava no Supabase; se recusar, o erro aparece na tela
+      }
       return clone(result);
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+      throw new ApiError(err.status ?? 500, err.message ?? 'Erro inesperado');
     } finally {
-      if (WRITE.has(method)) saveDb();
+      inFlight--;
+      if (path === '/config' && method === 'PUT') {
+        DB = null;
+        ready = null;
+      }
+    }
+  }
+
+  /** Busca no Supabase as alterações feitas por outras pessoas (a cada minuto e ao voltar para a aba). */
+  async function refreshRemote() {
+    if (!isRemote() || !sbSession() || inFlight > 0 || running) return;
+    try {
+      await sbReload();
+    } catch (err) {
+      console.warn('Falha ao atualizar dados do Supabase', err);
     }
   }
 
@@ -1859,10 +2819,16 @@ async function resetDb() {
     window.__monitorStarted = true;
     setTimeout(runAllChecks, 4000);
     setInterval(runAllChecks, 5 * 60_000);
+    setInterval(refreshRemote, 60_000);
+    window.addEventListener('focus', refreshRemote);
+  };
+  window.applyConfigOverride = (cfg) => {
+    configOverride = cfg;
+    DB = null;
+    ready = null;
   };
   window.resetDemoData = resetDb;
 })();
-
 
 // ===================== page-shared =====================
 /** Link real para o sistema (abre em nova aba) — o acesso é registrado em "recentes". */
@@ -1906,6 +2872,49 @@ function bindFavorites(root, onChange) {
   });
 }
 
+// ---------- WhatsApp ----------
+/** Monta o link do WhatsApp (wa.me) com a mensagem pronta. Números brasileiros recebem o código 55. */
+function waLink(phone, text) {
+  let d = String(phone ?? '').replace(/\D/g, '');
+  if (d.length === 10 || d.length === 11) d = `55${d}`;
+  return `https://wa.me/${d}?text=${encodeURIComponent(text)}`;
+}
+
+/** Resumo do chamado concluído, no formato de mensagem do WhatsApp. */
+function ticketSummary(t) {
+  const lines = [
+    `*SystemHub — Chamado #${t.id} concluído* ✅`,
+    '',
+    `*Assunto:* ${t.title}`,
+    `*Tipo:* ${TICKET_TYPE[t.type]?.label ?? t.type}`,
+    t.system_name ? `*Sistema:* ${t.system_name}` : null,
+    t.requester_name || t.reporter_name ? `*Solicitante:* ${t.requester_name ?? t.reporter_name}${t.requester_company ? ` (${t.requester_company})` : ''}` : null,
+    `*Aberto em:* ${formatDateTime(t.created_at)}`,
+    `*Concluído em:* ${formatDateTime(t.closed_at ?? new Date().toISOString())}`,
+    t.assignee_name ? `*Atendido por:* ${t.assignee_name}` : null,
+    '',
+    '*Resumo da solução:*',
+    t.resolution || '—',
+    '',
+    'Obrigado pelo contato! Se precisar, é só abrir um novo chamado.',
+  ];
+  return lines.filter((l) => l !== null).join('\n');
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.append(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+  toast('Copiado para a área de transferência', 'info');
+}
+
 /** Cache simples de listas usadas em selects. */
 const cache = {};
 async function cached(key, loader, ttl = 30_000) {
@@ -1916,7 +2925,6 @@ async function cached(key, loader, ttl = 30_000) {
   return v;
 }
 const invalidate = (...keys) => keys.forEach((k) => delete cache[k]);
-
 
 // ===================== page-login =====================
 // Página: login
@@ -1953,7 +2961,13 @@ function render(root, { onLogin }) {
             <p class="form-error small" hidden></p>
             <button class="btn primary block" type="submit">Entrar</button>
           </div>
-          <p class="muted xs center mt-6">Demonstração: contas fictícias como admin@systemhub.local — a senha está em DEMO_PASSWORD, no arquivo database.js.</p>
+          <div class="row between wrap mt-6 small">
+            <a href="/abrir-chamado">${ic('help-circle', 'sm')} Abrir um chamado sem login</a>
+            <a href="/configuracao">${ic('settings', 'sm')} Configurar conexão</a>
+          </div>
+          <p class="muted xs center mt-4">${isRemote()
+            ? html`Conectado ao Supabase · entre com sua conta.`
+            : html`Modo local (demonstração): contas fictícias como admin@systemhub.local — a senha está em DEMO_PASSWORD, no arquivo script.js.`}</p>
         </form>
       </div>
     </div>`);
@@ -1984,7 +2998,6 @@ function render(root, { onLogin }) {
 window.Pages = window.Pages || {};
 window.Pages['login'] = render;
 })();
-
 
 // ===================== page-dashboard =====================
 // Página: dashboard
@@ -2028,6 +3041,12 @@ async function render(root) {
       ${header()}
       <div class="stack" style="gap:24px">
         ${hasDemo ? demoNotice() : ''}
+        ${t.public_open || d.backups?.late || d.backups?.failed ? html`<div class="row wrap" style="gap:12px">
+          ${t.public_open ? html`<a class="notice" style="border-color:var(--info-ring);background:var(--info-bg);color:var(--info);text-decoration:none" href="/tickets">${ic('link', 'sm')}
+            <span><strong>${t.public_open}</strong> chamado(s) aberto(s) pelo link público aguardando atendimento</span></a>` : ''}
+          ${d.backups?.failed || d.backups?.late ? html`<a class="notice" style="border-color:var(--bad-ring);background:var(--bad-bg);color:var(--bad);text-decoration:none" href="/backups">${ic('hard-drive', 'sm')}
+            <span>Backups: <strong>${d.backups.failed}</strong> com falha · <strong>${d.backups.late}</strong> atrasado(s)</span></a>` : ''}
+        </div>` : ''}
         <div class="grid cols-6">
           ${stat('Sistemas cadastrados', s.total, 'layout-grid', 'navy', '/systems', `${s.critical} de criticidade crítica`)}
           ${stat('Ativos', s.operational, 'check-circle', 'ok', '/systems?status=operational', s.degraded ? `+ ${s.degraded} instáve${s.degraded === 1 ? 'l' : 'is'}` : 'Operando normalmente')}
@@ -2102,7 +3121,6 @@ async function render(root) {
 window.Pages = window.Pages || {};
 window.Pages['dashboard'] = render;
 })();
-
 
 // ===================== page-catalog =====================
 // Página: catalog
@@ -2292,7 +3310,6 @@ async function render(root, { query }) {
 window.Pages = window.Pages || {};
 window.Pages['catalog'] = render;
 })();
-
 
 // ===================== page-system-detail =====================
 // Página: system-detail
@@ -2620,7 +3637,6 @@ window.Pages = window.Pages || {};
 window.Pages['system-detail'] = render;
 })();
 
-
 // ===================== page-system-form =====================
 // Página: system-form
 (function () {
@@ -2883,7 +3899,6 @@ window.Pages = window.Pages || {};
 window.Pages['system-form'] = render;
 })();
 
-
 // ===================== page-monitoring =====================
 // Página: monitoring
 (function () {
@@ -3014,7 +4029,6 @@ window.Pages = window.Pages || {};
 window.Pages['monitoring'] = render;
 })();
 
-
 // ===================== page-tickets =====================
 // Página: tickets
 (function () {
@@ -3022,13 +4036,15 @@ const typeIcon = (type) => html`<span class="t-${type}" title="${TICKET_TYPE[typ
 
 async function render(root, { query }) {
   const manage = can('tickets:manage');
-  const f = { q: '', system: query.get('new') ? '' : (query.get('system') ?? ''), type: '', priority: '', assignee: '' };
+  const f = { q: '', system: query.get('new') ? '' : (query.get('system') ?? ''), type: '', priority: '', assignee: '', source: '', client: query.get('client') ?? '' };
   let view = localStorage.getItem('sh-tickets-view') || 'kanban';
   let tickets = [];
   let drag = null;
 
   const systems = await cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []);
   const assignable = manage ? await cached('assignable', () => api.get('/users/assignable')).catch(() => []) : [];
+  const clients = can('clients:view') ? await cached('clients-options', () => api.get('/clients').then((l) => l.map((c) => ({ id: c.id, name: c.name })))).catch(() => []) : [];
+  const clientName = (id) => clients.find((c) => String(c.id) === String(id))?.name ?? `#${id}`;
 
   root.innerHTML = String(html`
     <div class="page-header">
@@ -3047,7 +4063,11 @@ async function render(root, { query }) {
       <select class="input" data-f="type" aria-label="Tipo">${options(Object.entries(TICKET_TYPE).map(([k, v]) => [k, v.label]), '', { empty: 'Todos os tipos' })}</select>
       <select class="input" data-f="priority" aria-label="Prioridade">${options(Object.entries(PRIORITY).map(([k, v]) => [k, v.label]), '', { empty: 'Todas as prioridades' })}</select>
       ${manage ? html`<select class="input" data-f="assignee" aria-label="Responsável">${options([['me', 'Atribuídos a mim'], ...assignable.map((u) => [u.id, u.name])], '', { empty: 'Todos os responsáveis' })}</select>` : html`<div></div>`}
-    </div></div>
+      ${manage ? html`<select class="input" data-f="source" aria-label="Origem">${options([['public', 'Abertos pelo link público'], ['internal', 'Abertos pela equipe']], '', { empty: 'Qualquer origem' })}</select>` : ''}
+      ${clients.length ? html`<select class="input" data-f="client" aria-label="Cliente">${options(clients.map((c) => [c.id, c.name]), f.client, { empty: 'Todos os clientes' })}</select>` : ''}
+    </div>
+    ${f.client ? html`<div class="row mt-3"><button class="chip" data-clear-client>Cliente: ${clientName(f.client)} ${ic('x', 'sm')}</button></div>` : ''}
+    </div>
     <div id="board">${skeleton(300, 1)}</div>`);
 
   const board = root.querySelector('#board');
@@ -3072,6 +4092,7 @@ async function render(root, { query }) {
     <article class="card k-card" data-id="${t.id}" ${manage ? raw('draggable="true"') : ''}>
       <div class="row top">${typeIcon(t.type)}<p class="k-title grow clamp-2">${t.title}</p></div>
       ${t.system_name ? html`<p class="xs muted row mt-2" style="gap:6px">${sysIcon(t.system_icon, t.system_color, 'sm')}<span class="truncate">${t.system_name}</span></p>` : ''}
+      ${t.source === 'public' ? html`<p class="xs row mt-2" style="gap:6px"><span class="badge tone-info">${ic('link', 'sm')}Link público</span><span class="muted truncate">${t.requester_name ?? ''}</span></p>` : ''}
       <div class="k-foot"><span>#${t.id}</span>${prioBadge(t.priority)}
         ${t.due_date ? html`<span class="row ${isOverdue(t.due_date, t.status === 'done') ? 'text-bad strong' : ''}" style="gap:3px" title="Prazo">${ic('calendar-clock', 'sm')}${formatDate(t.due_date).slice(0, 5)}</span>` : ''}
         ${t.comments ? html`<span class="row" style="gap:3px">${ic('message-square', 'sm')}${t.comments}</span>` : ''}
@@ -3146,6 +4167,8 @@ async function render(root, { query }) {
     const { id, status, index } = drag;
     clearIndicators();
     const t = tickets.find((x) => x.id === id);
+    // Concluir pede o resumo da solução (que vai no WhatsApp)
+    if (status === 'done' && t.status !== 'done') return concludeModal(id);
     const prev = tickets.map((x) => ({ ...x }));
     // atualização otimista
     const target = columns()[status].filter((x) => x.id !== id);
@@ -3164,7 +4187,10 @@ async function render(root, { query }) {
 
   // ---------- formulário ----------
   const ticketForm = (t = null, defaults = {}) => {
-    const v = t ?? { title: '', description: '', type: defaults.type || 'bug', system_id: defaults.system || '', assignee_id: '', priority: 'medium', status: 'backlog', due_date: '' };
+    const v = t ?? {
+      title: '', description: '', type: defaults.type || 'bug', system_id: defaults.system || '', assignee_id: '', priority: 'medium', status: 'backlog', due_date: '',
+      client_id: f.client || '', requester_name: '', requester_phone: '', requester_email: '',
+    };
     openModal({
       title: t ? `Editar chamado #${t.id}` : 'Novo chamado',
       size: 'lg',
@@ -3178,6 +4204,12 @@ async function render(root, { query }) {
           ${field('Responsável', html`<select class="input" name="assignee_id">${options(assignable.map((u) => [u.id, u.name]), v.assignee_id, { empty: '— Sem responsável —' })}</select>`)}
           ${field('Status', html`<select class="input" name="status">${options(TICKET_STATUS_ORDER.map((s) => [s, TICKET_STATUS[s].label]), v.status)}</select>`)}` : ''}
         ${field('Descrição', html`<textarea class="input" name="description" style="min-height:130px" placeholder="Contexto, passos para reproduzir, impacto…">${v.description}</textarea>`, { cls: 'span-all' })}
+        ${manage ? html`
+          <p class="span-all strong mt-2" style="font-size:13px">Solicitante (para o resumo pelo WhatsApp)</p>
+          ${clients.length ? field('Cliente', html`<select class="input" name="client_id">${options(clients.map((c) => [c.id, c.name]), v.client_id, { empty: '— Nenhum —' })}</select>`) : ''}
+          ${field('Nome do solicitante', html`<input class="input" name="requester_name" value="${v.requester_name ?? ''}" maxlength="120" />`)}
+          ${field('WhatsApp do solicitante', html`<input class="input" name="requester_phone" value="${v.requester_phone ?? ''}" placeholder="(11) 99999-9999" maxlength="30" />`)}
+          ${field('E-mail do solicitante', html`<input class="input" type="email" name="requester_email" value="${v.requester_email ?? ''}" />`)}` : ''}
       </form>`,
       footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>${t ? 'Salvar' : 'Abrir chamado'}</button>`,
       onMount: (el, close) => el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
@@ -3212,6 +4244,8 @@ async function render(root, { query }) {
         return d.set('body', errorState(err));
       }
       d.set('head', html`<p class="strong">Chamado #${id}</p><div class="row">
+        ${manage && t.status !== 'done' ? html`<button class="btn primary sm" data-conclude>${ic('check-square', 'sm')} Concluir</button>` : ''}
+        ${t.status === 'done' ? html`<button class="btn sm" data-whatsapp style="color:#16a34a">${ic('whatsapp', 'sm')} Resumo no WhatsApp</button>` : ''}
         ${manage ? html`<button class="btn sm" data-edit>${ic('pencil', 'sm')} Editar</button>` : ''}
         ${can('tickets:delete') ? html`<button class="btn ghost sm icon" data-delete aria-label="Excluir chamado" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}
         <button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button></div>`);
@@ -3225,8 +4259,15 @@ async function render(root, { query }) {
           <div><dt>Responsável</dt><dd>${t.assignee_name ?? '—'}</dd></div>
           <div><dt>Aberto por</dt><dd>${t.reporter_name ?? '—'} <span class="xs muted">· ${formatDate(t.created_at)}</span></dd></div>
           <div><dt>Prazo</dt><dd class="${isOverdue(t.due_date, t.status === 'done') ? 'text-bad' : ''}">${formatDate(t.due_date)}</dd></div>
+          <div><dt>Origem</dt><dd>${t.source === 'public' ? html`<span class="badge tone-info">${ic('link', 'sm')}Link público</span>` : 'Equipe'}</dd></div>
+          <div><dt>Cliente</dt><dd>${t.client_id && can('clients:view') ? html`<a href="/clients?open=${t.client_id}">${t.client_name}</a>` : (t.client_name ?? '—')}</dd></div>
+          ${t.requester_name || t.requester_phone || t.requester_email ? html`
+            <div><dt>Solicitante</dt><dd>${t.requester_name ?? '—'}${t.requester_company ? html` <span class="xs muted">· ${t.requester_company}</span>` : ''}</dd></div>
+            <div><dt>Contato</dt><dd class="small">${t.requester_phone ? html`<span class="row" style="gap:4px">${ic('whatsapp', 'sm')}${t.requester_phone}</span>` : ''}${t.requester_email ? html`<a href="mailto:${t.requester_email}">${t.requester_email}</a>` : ''}</dd></div>` : ''}
         </dl>
         <div class="pre mt-4">${t.description || html`<span class="muted">Sem descrição</span>`}</div>
+        ${t.resolution ? html`<div class="mt-4" style="padding:12px 16px;border-radius:8px;border:1px solid var(--ok-ring);background:var(--ok-bg)">
+          <p class="xs strong text-ok">Resumo da solução</p><p class="pre mt-1">${t.resolution}</p></div>` : ''}
         <h3 class="mt-6 mb-4" style="font-size:14px">Histórico</h3>
         <ol class="events">${t.events.map((e) => html`<li>${e.user_name ? avatar(e.user_name, 'sm') : html`<span style="width:24px"></span>`}
           <div class="grow"><p class="xs"><strong>${e.user_name ?? 'Sistema'}</strong> <span class="muted">· ${timeAgo(e.created_at)}</span></p>
@@ -3234,6 +4275,8 @@ async function render(root, { query }) {
       d.set('foot', html`<form class="row grow" data-comment><input class="input" name="message" placeholder="Adicionar comentário…" maxlength="5000" aria-label="Comentário" />
         <button class="btn primary icon" type="submit" aria-label="Enviar comentário">${ic('send', 'sm')}</button></form>`);
       d.el.querySelector('[data-edit]')?.addEventListener('click', () => { d.close(); ticketForm(t); });
+      d.el.querySelector('[data-conclude]')?.addEventListener('click', () => { d.close(); concludeModal(id); });
+      d.el.querySelector('[data-whatsapp]')?.addEventListener('click', () => whatsappModal(t));
       d.el.querySelector('[data-delete]')?.addEventListener('click', async () => {
         if (!(await confirmDialog({ title: 'Excluir chamado', danger: true, confirmLabel: 'Excluir', message: 'O chamado e seu histórico serão removidos. A ação é registrada na auditoria.' }))) return;
         try { await api.del(`/tickets/${id}`); toast('Chamado excluído'); d.close(); load(); } catch (err) { toast(err.message, 'error'); }
@@ -3248,6 +4291,65 @@ async function render(root, { query }) {
       });
     };
     await drawDetail();
+  };
+
+  // ---------- concluir + resumo pelo WhatsApp ----------
+  const concludeModal = async (id) => {
+    let t;
+    try {
+      t = await api.get(`/tickets/${id}`);
+    } catch (err) {
+      return toast(err.message, 'error');
+    }
+    openModal({
+      title: `Concluir chamado #${id}`,
+      description: 'Descreva a solução. Esse resumo fica no histórico e é enviado pelo WhatsApp ao solicitante e a você.',
+      body: html`<div class="stack">
+        <p class="strong">${t.title}</p>
+        ${field('Resumo da solução *', html`<textarea class="input" name="resolution" style="min-height:140px" placeholder="Ex.: Ajustamos a permissão do seu usuário e o relatório voltou a ser gerado normalmente." autofocus>${t.resolution ?? ''}</textarea>`)}
+      </div>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>${ic('check-square', 'sm')} Concluir e preparar resumo</button>`,
+      onMount: (el, close) => el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+        const resolution = el.querySelector('[name=resolution]').value;
+        if (resolution.trim().length < 3) return toast('Escreva o resumo da solução.', 'error');
+        try {
+          await api.post(`/tickets/${id}/conclude`, { resolution });
+          toast(`Chamado #${id} concluído`);
+          close();
+          await load();
+          whatsappModal(await api.get(`/tickets/${id}`));
+        } catch (err) { toast(err.message, 'error'); }
+      })),
+    });
+  };
+
+  const whatsappModal = async (t) => {
+    const settings = await api.get('/settings').catch(() => ({ owner_whatsapp: '' }));
+    const text = ticketSummary(t);
+    const owner = settings.owner_whatsapp;
+    const sendBtn = (to, phone, label) => (phone
+      ? html`<a class="btn ${to === 'requester' ? 'primary' : ''}" href="${waLink(phone, text)}" target="_blank" rel="noopener noreferrer" data-wa="${to}" style="${to === 'requester' ? 'background:#16a34a' : ''}">${ic('whatsapp', 'sm')} ${label}</a>`
+      : html`<button class="btn" disabled title="Número não informado">${ic('whatsapp', 'sm')} ${label}</button>`);
+    openModal({
+      title: 'Enviar resumo pelo WhatsApp',
+      description: 'O WhatsApp abre com a mensagem pronta — é só conferir e tocar em enviar.',
+      size: 'lg',
+      body: html`<div class="stack">
+        <pre class="small" style="margin:0;white-space:pre-wrap;padding:14px 16px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);font-family:var(--font)">${text}</pre>
+        <div class="grid cols-2" style="gap:8px">
+          <div><p class="xs muted mb-4" style="margin-bottom:6px">Solicitante: ${t.requester_name ?? t.reporter_name ?? '—'} ${t.requester_phone ? `· ${t.requester_phone}` : '· sem WhatsApp informado'}</p>${sendBtn('requester', t.requester_phone, 'Enviar ao solicitante')}</div>
+          <div><p class="xs muted" style="margin-bottom:6px">Você ${owner ? `· ${owner}` : '· configure seu número em Configurações'}</p>${sendBtn('owner', owner, 'Enviar para mim')}</div>
+        </div>
+        ${!t.requester_phone && manage ? html`<p class="xs muted">Dica: edite o chamado e preencha o WhatsApp do solicitante para habilitar o envio.</p>` : ''}
+      </div>`,
+      footer: html`<button class="btn" data-copy>${ic('copy', 'sm')} Copiar texto</button><button class="btn primary" data-close>Fechar</button>`,
+      onMount: (el) => {
+        el.querySelector('[data-copy]').addEventListener('click', () => copyText(text));
+        el.querySelectorAll('[data-wa]').forEach((a) => a.addEventListener('click', () => {
+          api.post(`/tickets/${t.id}/whatsapp-log`, { to: a.dataset.wa }).catch(() => undefined);
+        }));
+      },
+    });
   };
 
   // ---------- eventos ----------
@@ -3267,6 +4369,14 @@ async function render(root, { query }) {
       return drawBoard();
     }
     if (t.closest('[data-action=new]')) return ticketForm();
+    if (t.closest('[data-clear-client]')) {
+      f.client = '';
+      setQuery({ client: null });
+      t.closest('[data-clear-client]').remove();
+      const sel = root.querySelector('[data-f=client]');
+      if (sel) sel.value = '';
+      return load();
+    }
     if (t.closest('[data-action=retry]')) return load();
     const item = t.closest('[data-id]');
     if (item && !t.closest('a')) openTicket(Number(item.dataset.id));
@@ -3282,7 +4392,6 @@ async function render(root, { query }) {
 window.Pages = window.Pages || {};
 window.Pages['tickets'] = render;
 })();
-
 
 // ===================== page-people =====================
 // Página: people
@@ -3438,7 +4547,6 @@ window.Pages = window.Pages || {};
 window.Pages['people'] = render;
 })();
 
-
 // ===================== page-users =====================
 // Página: users
 (function () {
@@ -3556,7 +4664,6 @@ window.Pages = window.Pages || {};
 window.Pages['users'] = render;
 })();
 
-
 // ===================== page-audit =====================
 // Página: audit
 (function () {
@@ -3617,6 +4724,695 @@ window.Pages = window.Pages || {};
 window.Pages['audit'] = render;
 })();
 
+// ===================== page-clients =====================
+// Página: clientes
+(function () {
+/** Máscara simples de CPF/CNPJ e telefone enquanto digita. */
+function maskDocument(v, kind) {
+  const d = v.replace(/\D/g, '').slice(0, kind === 'PF' ? 11 : 14);
+  return kind === 'PF'
+    ? d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+    : d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+}
+function maskPhone(v) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 10) return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+  return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+}
+
+async function render(root, { query }) {
+  const manage = can('clients:manage');
+  const f = { q: '', status: '', system: '' };
+  let list = [];
+  const systems = await cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Clientes</h1><p class="sub" id="ccount">Cadastro de clientes atendidos e os sistemas que utilizam</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('plus', 'sm')} Novo cliente</button>` : ''}
+    </div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:240px">${ic('search', 'sm')}<input class="input" id="cq" placeholder="Buscar por nome, CPF/CNPJ, contato, e-mail, telefone ou cidade" aria-label="Buscar clientes" /></div>
+      <select class="input" style="width:180px" data-f="status" aria-label="Situação">${options(Object.entries(CLIENT_STATUS).map(([k, v]) => [k, v.label]), '', { empty: 'Todas as situações' })}</select>
+      <select class="input" style="width:240px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), '', { empty: 'Todos os sistemas' })}</select>
+    </div></div>
+    <div id="clist">${skeleton(56, 4)}</div>`);
+
+  const box = root.querySelector('#clist');
+
+  const load = async () => {
+    try {
+      list = await api.get('/clients', f);
+      root.querySelector('#ccount').textContent = `${list.length} cliente(s) · cadastro de clientes atendidos e os sistemas que utilizam`;
+      draw();
+    } catch (err) {
+      box.innerHTML = String(errorState(err));
+    }
+  };
+
+  const draw = () => {
+    box.innerHTML = String(list.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Cliente</th><th>CPF/CNPJ</th><th>Contato</th><th>Cidade</th><th>Sistemas</th><th>Chamados</th><th>Situação</th><th></th></tr></thead>
+      <tbody>${list.map((c) => html`<tr class="clickable" data-open="${c.id}">
+        <td style="min-width:240px"><div class="row">${avatar(c.name)}<div><p class="strong">${c.name} ${c.is_demo ? badge('Fictício', 'demo') : ''}</p><p class="xs muted">${c.kind === 'PF' ? 'Pessoa física' : 'Pessoa jurídica'}</p></div></div></td>
+        <td class="nowrap">${c.document ?? '—'}</td>
+        <td><p class="nowrap">${c.contact_name ?? '—'}</p><p class="xs muted nowrap">${c.phone ?? ''}${c.phone && c.email ? ' · ' : ''}${c.email ?? ''}</p></td>
+        <td class="nowrap">${c.city ? `${c.city}${c.state ? `/${c.state}` : ''}` : '—'}</td>
+        <td><div class="row wrap" style="gap:4px">${c.systems.slice(0, 3).map((s) => html`<span class="tag">${s.name}</span>`)}${c.systems.length > 3 ? html`<span class="xs muted">+${c.systems.length - 3}</span>` : ''}</div></td>
+        <td class="nowrap">${c.tickets_open ? html`<strong>${c.tickets_open}</strong> aberto(s) · ` : ''}<span class="muted">${c.tickets_total} no total</span></td>
+        <td>${badge(CLIENT_STATUS[c.status]?.label ?? c.status, CLIENT_STATUS[c.status]?.tone)}</td>
+        <td class="right nowrap">
+          ${c.phone ? html`<a class="btn ghost sm icon" href="${waLink(c.phone, `Olá, ${c.contact_name ?? c.name}!`)}" target="_blank" rel="noopener noreferrer" title="Conversar no WhatsApp" aria-label="WhatsApp" style="color:#16a34a">${ic('whatsapp', 'sm')}</a>` : ''}
+          ${manage ? html`<button class="btn ghost sm icon" data-edit="${c.id}" aria-label="Editar ${c.name}">${ic('pencil', 'sm')}</button>
+            <button class="btn ghost sm icon" data-del="${c.id}" aria-label="Excluir ${c.name}" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}
+        </td></tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhum cliente encontrado', manage ? 'Cadastre seu primeiro cliente no botão “Novo cliente”.' : '', 'briefcase')}</div>`);
+  };
+
+  const clientModal = (c = { kind: 'PJ', status: 'active', system_ids: [] }) => {
+    const sel = new Set(c.system_ids ?? []);
+    openModal({
+      title: c.id ? 'Editar cliente' : 'Novo cliente',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate>
+        ${field('Nome / razão social *', html`<input class="input" name="name" value="${c.name ?? ''}" maxlength="160" autofocus />`, { cls: 'span-all' })}
+        ${field('Tipo', html`<select class="input" name="kind">${options([['PJ', 'Pessoa jurídica (CNPJ)'], ['PF', 'Pessoa física (CPF)']], c.kind)}</select>`)}
+        ${field('CPF / CNPJ', html`<input class="input" name="document" value="${c.document ?? ''}" inputmode="numeric" />`)}
+        ${field('Pessoa de contato', html`<input class="input" name="contact_name" value="${c.contact_name ?? ''}" maxlength="120" />`)}
+        ${field('WhatsApp / telefone', html`<input class="input" name="phone" value="${c.phone ?? ''}" inputmode="tel" placeholder="(11) 99999-9999" />`)}
+        ${field('E-mail', html`<input class="input" type="email" name="email" value="${c.email ?? ''}" />`)}
+        ${field('Situação', html`<select class="input" name="status">${options(Object.entries(CLIENT_STATUS).map(([k, v]) => [k, v.label]), c.status)}</select>`)}
+        ${field('Cidade', html`<input class="input" name="city" value="${c.city ?? ''}" maxlength="80" />`)}
+        ${field('UF', html`<select class="input" name="state">${options(UF.map((u) => [u, u]), c.state, { empty: '—' })}</select>`)}
+        <div class="span-all"><span class="field"><span class="label">Sistemas que utiliza</span></span>
+          <div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:6px" class="grid cols-2">
+            ${systems.map((s) => html`<label class="check"><input type="checkbox" value="${s.id}" ${sel.has(s.id) ? raw('checked') : ''} /><span class="small">${s.name}</span></label>`)}
+          </div></div>
+        ${field('Observações', html`<textarea class="input" name="notes">${c.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        const doc = el.querySelector('[name=document]');
+        const kind = el.querySelector('[name=kind]');
+        doc.addEventListener('input', () => (doc.value = maskDocument(doc.value, kind.value)));
+        kind.addEventListener('change', () => (doc.value = maskDocument(doc.value, kind.value)));
+        const phone = el.querySelector('[name=phone]');
+        phone.addEventListener('input', () => (phone.value = maskPhone(phone.value)));
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = Object.fromEntries(new FormData(el.querySelector('form')));
+          body.system_ids = [...el.querySelectorAll('input[type=checkbox]:checked')].map((i) => Number(i.value));
+          try {
+            if (c.id) await api.put(`/clients/${c.id}`, body);
+            else await api.post('/clients', body);
+            invalidate('clients-options');
+            toast('Cliente salvo');
+            close();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const openClient = async (id) => {
+    setQuery({ open: id });
+    const d = openDrawer({
+      head: html`<p class="strong">Cliente</p><button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button>`,
+      body: html`<div class="center"><span class="spinner"></span></div>`,
+    });
+    d.onClose(() => setQuery({ open: null }));
+    let c;
+    try {
+      c = await api.get(`/clients/${id}`);
+    } catch (err) {
+      return d.set('body', errorState(err));
+    }
+    d.set('head', html`<p class="strong">Cliente</p><div class="row">
+      ${manage ? html`<button class="btn sm" data-edit-drawer>${ic('pencil', 'sm')} Editar</button>` : ''}
+      <button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button></div>`);
+    d.set('body', html`
+      <div class="row">${avatar(c.name)}<div><h2 style="font-size:20px">${c.name}</h2><p class="xs muted">${c.kind === 'PF' ? 'Pessoa física' : 'Pessoa jurídica'} · ${c.document ?? 'sem documento'}</p></div></div>
+      <div class="row wrap mt-3">${badge(CLIENT_STATUS[c.status]?.label ?? c.status, CLIENT_STATUS[c.status]?.tone)}${c.is_demo ? badge('Fictício', 'demo') : ''}</div>
+      <dl class="facts">
+        <div><dt>Contato</dt><dd>${c.contact_name ?? '—'}</dd></div>
+        <div><dt>WhatsApp / telefone</dt><dd>${c.phone ? html`<a href="${waLink(c.phone, `Olá, ${c.contact_name ?? c.name}!`)}" target="_blank" rel="noopener noreferrer" class="row" style="gap:4px">${ic('whatsapp', 'sm')}${c.phone}</a>` : '—'}</dd></div>
+        <div><dt>E-mail</dt><dd>${c.email ? html`<a href="mailto:${c.email}">${c.email}</a>` : '—'}</dd></div>
+        <div><dt>Cidade</dt><dd>${c.city ? `${c.city}${c.state ? `/${c.state}` : ''}` : '—'}</dd></div>
+      </dl>
+      <h3 class="mt-6" style="font-size:14px">Sistemas que utiliza</h3>
+      <div class="row wrap mt-2" style="gap:6px">${c.systems.length ? c.systems.map((s) => html`<a class="tag" href="/systems/${s.id}">${s.name}</a>`) : html`<span class="muted small">Nenhum sistema vinculado</span>`}</div>
+      ${c.notes ? html`<h3 class="mt-6" style="font-size:14px">Observações</h3><p class="pre mt-2">${c.notes}</p>` : ''}
+      <div class="row between mt-6"><h3 style="font-size:14px">Chamados (${c.tickets.length})</h3>
+        <a class="btn sm" href="/tickets?new=1&client=${c.id}">${ic('plus', 'sm')} Novo chamado</a></div>
+      <div class="stack sm mt-2">${c.tickets.length ? c.tickets.map((t) => html`
+        <a class="list-item" href="/tickets?open=${t.id}" style="border:1px solid var(--border)">
+          <span class="grow"><span class="strong truncate" style="display:block">#${t.id} ${t.title}</span>
+            <span class="xs muted">${TICKET_TYPE[t.type]?.label ?? t.type} · ${TICKET_STATUS[t.status].label} · ${formatDate(t.created_at)}</span></span>
+          ${prioBadge(t.priority)}</a>`) : html`<p class="muted small">Nenhum chamado deste cliente.</p>`}</div>`);
+    d.el.querySelector('[data-edit-drawer]')?.addEventListener('click', () => { d.close(); clientModal(c); });
+  };
+
+  const cq = root.querySelector('#cq');
+  cq.addEventListener('input', debounce(() => { f.q = cq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', async (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return clientModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const ed = t.closest('[data-edit]');
+    if (ed) return clientModal(list.find((c) => c.id === Number(ed.dataset.edit)));
+    const del = t.closest('[data-del]');
+    if (del) {
+      const c = list.find((x) => x.id === Number(del.dataset.del));
+      const ok = await confirmDialog({ title: 'Excluir cliente', danger: true, confirmLabel: 'Excluir', message: html`Excluir <strong>${c.name}</strong>? Os chamados dele são mantidos, sem vínculo com o cliente.` });
+      if (!ok) return;
+      try { await api.del(`/clients/${c.id}`); invalidate('clients-options'); toast('Cliente excluído'); await load(); } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
+    const row = t.closest('[data-open]');
+    if (row && !t.closest('a, button')) openClient(Number(row.dataset.open));
+  });
+
+  await load();
+  if (query.get('open')) openClient(Number(query.get('open')));
+}
+
+window.Pages = window.Pages || {};
+window.Pages['clients'] = render;
+})();
+
+// ===================== page-backups =====================
+// Página: controle de backups dos sistemas
+(function () {
+const healthBadge = (h) => badge(BACKUP_HEALTH[h]?.label ?? h, BACKUP_HEALTH[h]?.tone);
+const fmtSize = (mb) => (mb == null ? '—' : mb >= 1024 ? `${(mb / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} GB` : `${Math.round(mb).toLocaleString('pt-BR')} MB`);
+
+async function render(root, { query }) {
+  const manage = can('backups:manage');
+  const f = { q: '', health: '', system: query.get('system') ?? '' };
+  let data = null;
+  const [systems, people] = await Promise.all([
+    cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []),
+    api.get('/people').catch(() => []),
+  ]);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Backups</h1><p class="sub">Rotinas de backup de cada sistema, execuções e alertas de atraso ou falha</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('plus', 'sm')} Nova rotina</button>` : ''}
+    </div>
+    <div id="bsummary" class="mb-6">${skeleton(110, 1)}</div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:240px">${ic('search', 'sm')}<input class="input" id="bq" placeholder="Buscar por rotina, sistema, destino ou responsável" aria-label="Buscar rotinas" /></div>
+      <select class="input" style="width:200px" data-f="health" aria-label="Situação">${options(Object.entries(BACKUP_HEALTH).map(([k, v]) => [k, v.label]), '', { empty: 'Todas as situações' })}</select>
+      <select class="input" style="width:240px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), f.system, { empty: 'Todos os sistemas' })}</select>
+    </div></div>
+    <div id="blist">${skeleton(56, 4)}</div>`);
+
+  const load = async () => {
+    try {
+      data = await api.get('/backups', f);
+      drawSummary();
+      drawList();
+    } catch (err) {
+      root.querySelector('#blist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const drawSummary = () => {
+    const s = data.summary;
+    const tile = (label, value, iconName, tone, hint, filter) => html`
+      <button class="card stat clickable" style="text-align:left;border:1px solid var(--border)" data-quick="${filter ?? ''}">
+        <span class="s-head">${label}<span class="s-icon ic-${tone}">${ic(iconName)}</span></span>
+        <span class="s-value">${value}</span><span class="s-hint">${hint}</span></button>`;
+    root.querySelector('#bsummary').innerHTML = String(html`
+      ${s.failed || s.late ? html`<div class="alert-box mb-4"><p class="strong row" style="color:inherit">${ic('alert-octagon', 'sm')} Atenção</p>
+        <p class="small mt-1">${s.failed ? `${s.failed} rotina(s) com falha na última execução. ` : ''}${s.late ? `${s.late} rotina(s) atrasada(s) (sem backup bem-sucedido dentro do prazo).` : ''}</p></div>` : ''}
+      <div class="grid cols-4">
+        ${tile('Rotinas ativas', s.active, 'hard-drive', 'navy', `${s.systems_without_backup} sistema(s) sem rotina de backup`, '')}
+        ${tile('Em dia', s.ok, 'check-circle', 'ok', 'Último backup dentro do prazo', 'ok')}
+        ${tile('Atrasados ou com falha', s.late + s.failed, 'alert-octagon', 'bad', `${s.failed} falha(s) · ${s.late} atraso(s)`, s.failed ? 'failed' : 'late')}
+        ${tile('Sucesso em 30 dias', formatPercent(s.success_rate_30d, 1), 'activity', 'info', 'Execuções bem-sucedidas no período', null)}
+      </div>`);
+  };
+
+  const drawList = () => {
+    const items = data.items;
+    root.querySelector('#blist').innerHTML = String(items.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Sistema / rotina</th><th>Situação</th><th>Tipo</th><th>Frequência</th><th>Último backup OK</th><th>Próxima execução</th><th>Tamanho</th><th>Destino</th><th></th></tr></thead>
+      <tbody>${items.map((j) => html`<tr class="clickable" data-open="${j.id}">
+        <td style="min-width:230px"><div class="row">${sysIcon(j.system_icon, j.system_color, 'sm')}<div><p class="strong">${j.system_name ?? '—'}</p><p class="xs muted">${j.name}${j.is_demo ? ' · fictício' : ''}</p></div></div></td>
+        <td>${healthBadge(j.health)}${j.failures_30d ? html`<p class="xs muted mt-1">${j.failures_30d} falha(s) em 30 dias</p>` : ''}</td>
+        <td class="nowrap">${BACKUP_TYPE[j.type] ?? j.type}</td>
+        <td><p class="nowrap">${BACKUP_FREQ[j.frequency] ?? j.frequency}</p>${j.schedule ? html`<p class="xs muted nowrap">${j.schedule}</p>` : ''}</td>
+        <td class="nowrap" title="${formatDateTime(j.last_success_at)}">${j.last_success_at ? timeAgo(j.last_success_at) : '—'}</td>
+        <td class="nowrap ${j.next_run_at && j.next_run_at < new Date().toISOString() ? 'text-bad' : ''}">${j.next_run_at ? formatDateTime(j.next_run_at) : '—'}</td>
+        <td class="nowrap">${fmtSize(j.last_size_mb)}</td>
+        <td class="xs muted" style="max-width:200px">${j.destination ?? '—'}</td>
+        <td class="right nowrap">${manage ? html`<button class="btn sm" data-run="${j.id}">${ic('plus', 'sm')} Registrar</button>` : ''}</td>
+      </tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhuma rotina de backup', manage ? 'Cadastre as rotinas de backup dos seus sistemas para acompanhar atrasos e falhas.' : '', 'hard-drive')}</div>`);
+  };
+
+  const jobModal = (j = { type: 'full', frequency: 'daily', active: true, system_id: f.system || '' }) => {
+    const st = { active: j.active !== false };
+    openModal({
+      title: j.id ? 'Editar rotina de backup' : 'Nova rotina de backup',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate>
+        ${field('Sistema *', html`<select class="input" name="system_id">${options(systems.map((s) => [s.id, s.name]), j.system_id, { empty: '— Selecione —' })}</select>`)}
+        ${field('Nome da rotina *', html`<input class="input" name="name" value="${j.name ?? ''}" placeholder="Ex.: Banco de dados — completo" maxlength="120" />`)}
+        ${field('Tipo', html`<select class="input" name="type">${options(Object.entries(BACKUP_TYPE), j.type)}</select>`)}
+        ${field('Frequência', html`<select class="input" name="frequency">${options(Object.entries(BACKUP_FREQ), j.frequency)}</select>`, { hint: 'Usada para detectar atraso (tolerância de 50%).' })}
+        ${field('Agendamento', html`<input class="input" name="schedule" value="${j.schedule ?? ''}" placeholder="Ex.: Todos os dias às 02:00" maxlength="120" />`)}
+        ${field('Retenção (dias)', html`<input class="input" type="number" min="1" max="3650" name="retention_days" value="${j.retention_days ?? ''}" />`)}
+        ${field('Destino / local', html`<input class="input" name="destination" value="${j.destination ?? ''}" placeholder="Ex.: Storage S3, NAS do datacenter" maxlength="200" />`, { cls: 'span-all' })}
+        ${field('Responsável', html`<select class="input" name="responsible_id">${options(people.map((p) => [p.id, p.name]), j.responsible_id, { empty: '— Nenhum —' })}</select>`)}
+        <div style="align-self:end">${toggle('active', st.active, 'Rotina ativa', 'Rotinas inativas não geram alertas.')}</div>
+        ${field('Observações', html`<textarea class="input" name="notes">${j.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        bindToggles(el, st);
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = { ...Object.fromEntries(new FormData(el.querySelector('form'))), active: st.active };
+          try {
+            if (j.id) await api.put(`/backups/${j.id}`, body);
+            else await api.post('/backups', body);
+            toast('Rotina salva');
+            close();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const runModal = (j) => {
+    const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+    let status = 'success';
+    openModal({
+      title: 'Registrar execução de backup',
+      description: `${j.system_name} · ${j.name}`,
+      body: html`<div class="stack">
+        <div class="grid cols-2" style="gap:8px">
+          <button type="button" class="choice on" data-st="success"><span class="status-dot c-operational"></span>Concluído com sucesso</button>
+          <button type="button" class="choice" data-st="failed"><span class="status-dot c-down"></span>Falhou</button>
+        </div>
+        <div class="grid cols-2">
+          ${field('Término', html`<input class="input" type="datetime-local" name="finished_at" value="${local}" max="${local}" />`)}
+          ${field('Tamanho (MB)', html`<input class="input" type="number" min="0" step="0.1" name="size_mb" placeholder="Opcional" />`)}
+        </div>
+        ${field('Observação', html`<textarea class="input" name="notes" placeholder="Ex.: erro de espaço em disco, backup validado com restauração de teste…"></textarea>`)}
+        <p class="xs muted">Falhas notificam administradores, gestores e desenvolvedores.</p>
+      </div>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Registrar</button>`,
+      onMount: (el, close) => {
+        el.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-st]');
+          if (b) { status = b.dataset.st; el.querySelectorAll('[data-st]').forEach((x) => x.classList.toggle('on', x === b)); }
+        });
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const v = (n) => el.querySelector(`[name=${n}]`).value;
+          try {
+            await api.post(`/backups/${j.id}/runs`, { status, finished_at: v('finished_at') ? new Date(v('finished_at')).toISOString() : null, size_mb: v('size_mb'), notes: v('notes') });
+            toast(status === 'success' ? 'Backup registrado' : 'Falha registrada e equipe notificada', status === 'success' ? 'success' : 'info');
+            close();
+            refreshNotifications();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const openJob = async (id) => {
+    const d = openDrawer({
+      head: html`<p class="strong">Rotina de backup</p><button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button>`,
+      body: html`<div class="center"><span class="spinner"></span></div>`,
+    });
+    let j;
+    try {
+      j = await api.get(`/backups/${id}`);
+    } catch (err) {
+      return d.set('body', errorState(err));
+    }
+    d.set('head', html`<p class="strong">Rotina de backup</p><div class="row">
+      ${manage ? html`<button class="btn primary sm" data-run-d>${ic('plus', 'sm')} Registrar execução</button>
+        <button class="btn sm" data-edit-d>${ic('pencil', 'sm')} Editar</button>
+        <button class="btn ghost sm icon" data-del-d aria-label="Excluir rotina" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}
+      <button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button></div>`);
+    d.set('body', html`
+      <div class="row">${sysIcon(j.system_icon, j.system_color)}<div><h2 style="font-size:20px">${j.name}</h2><p class="xs muted"><a href="/systems/${j.system_id}">${j.system_name}</a></p></div></div>
+      <div class="row wrap mt-3">${healthBadge(j.health)}${j.is_demo ? badge('Fictício', 'demo') : ''}</div>
+      <dl class="facts">
+        <div><dt>Tipo</dt><dd>${BACKUP_TYPE[j.type]}</dd></div>
+        <div><dt>Frequência</dt><dd>${BACKUP_FREQ[j.frequency]}${j.schedule ? html` <span class="xs muted">· ${j.schedule}</span>` : ''}</dd></div>
+        <div><dt>Último backup OK</dt><dd>${formatDateTime(j.last_success_at)}</dd></div>
+        <div><dt>Próxima execução</dt><dd>${formatDateTime(j.next_run_at)}</dd></div>
+        <div><dt>Destino</dt><dd>${j.destination ?? '—'}</dd></div>
+        <div><dt>Retenção</dt><dd>${j.retention_days ? `${j.retention_days} dias` : '—'}</dd></div>
+        <div><dt>Responsável</dt><dd>${j.responsible_name ?? '—'}</dd></div>
+        <div><dt>Último tamanho</dt><dd>${fmtSize(j.last_size_mb)}</dd></div>
+      </dl>
+      ${j.notes ? html`<p class="pre small mt-4">${j.notes}</p>` : ''}
+      <h3 class="mt-6 mb-4" style="font-size:14px">Execuções (${j.runs.length})</h3>
+      ${j.runs.length ? html`<div class="table-wrap"><table class="table"><thead><tr><th>Término</th><th>Resultado</th><th>Tamanho</th><th>Origem</th></tr></thead><tbody>
+        ${j.runs.map((r) => html`<tr><td class="nowrap">${formatDateTime(r.finished_at)}</td>
+          <td>${r.status === 'success' ? html`<span class="row text-ok" style="gap:4px">${ic('check', 'sm')}Sucesso</span>` : html`<span class="row text-bad" style="gap:4px">${ic('x', 'sm')}Falha</span>`}${r.notes ? html`<p class="xs muted">${r.notes}</p>` : ''}</td>
+          <td class="nowrap">${fmtSize(r.size_mb)}</td>
+          <td class="xs">${r.source === 'simulated' ? 'Simulado' : r.source === 'manual' ? `Manual${r.created_by_name ? ` · ${r.created_by_name}` : ''}` : r.source}</td></tr>`)}
+      </tbody></table></div>` : emptyState('Nenhuma execução registrada')}`);
+    d.el.querySelector('[data-run-d]')?.addEventListener('click', () => { d.close(); runModal(j); });
+    d.el.querySelector('[data-edit-d]')?.addEventListener('click', () => { d.close(); jobModal(j); });
+    d.el.querySelector('[data-del-d]')?.addEventListener('click', async () => {
+      if (!(await confirmDialog({ title: 'Excluir rotina', danger: true, confirmLabel: 'Excluir', message: html`Excluir a rotina <strong>${j.name}</strong> e todo o histórico de execuções?` }))) return;
+      try { await api.del(`/backups/${j.id}`); toast('Rotina excluída'); d.close(); await load(); } catch (err) { toast(err.message, 'error'); }
+    });
+  };
+
+  const bq = root.querySelector('#bq');
+  bq.addEventListener('input', debounce(() => { f.q = bq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return jobModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const q = t.closest('[data-quick]');
+    if (q) {
+      f.health = q.dataset.quick;
+      root.querySelector('[data-f=health]').value = f.health;
+      return load();
+    }
+    const run = t.closest('[data-run]');
+    if (run) return runModal(data.items.find((j) => j.id === Number(run.dataset.run)));
+    const row = t.closest('[data-open]');
+    if (row && !t.closest('a, button')) openJob(Number(row.dataset.open));
+  });
+
+  await load();
+}
+
+window.Pages = window.Pages || {};
+window.Pages['backups'] = render;
+})();
+
+// ===================== page-settings =====================
+// Página: configurações (conexão Supabase, instalação, WhatsApp e link público de chamados)
+(function () {
+/** Link público para abrir chamado. Inclui a conexão quando ela não está fixada no script.js. */
+function publicTicketLink(cfg, publicUrl) {
+  const base = (publicUrl || `${location.origin === 'null' || location.protocol === 'file:' ? location.href.split('#')[0] : location.origin + location.pathname}`).split('#')[0];
+  let link = `${base}#/abrir-chamado`;
+  if (cfg.mode === 'supabase' && !cfg.fixed) {
+    const c = btoa(JSON.stringify({ u: cfg.supabaseUrl, k: cfg.anonKey }));
+    link += `?c=${encodeURIComponent(c)}`;
+  }
+  return link;
+}
+
+async function render(root, { setup = false } = {}) {
+  const logged = !!state.user;
+  const admin = logged && can('settings:manage');
+
+  const load = async () => {
+    const cfg = await api.get('/config');
+    const saved = (() => { try { return JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '{}') ?? {}; } catch { return {}; } })();
+    cfg.anonKey = cfg.fixed ? SUPABASE_ANON_KEY : saved.supabaseKey ?? '';
+    const settings = admin ? await api.get('/settings').catch(() => ({})) : {};
+    draw(cfg, settings);
+  };
+
+  const step = (n, title, body) => html`<div class="row top" style="gap:14px"><span class="avatar sm" style="flex-shrink:0;background:var(--accent-400);color:var(--navy-950)">${n}</span><div class="grow"><p class="strong">${title}</p><div class="small muted mt-1">${body}</div></div></div>`;
+
+  const draw = (cfg, settings) => {
+    const remote = cfg.mode === 'supabase';
+    const link = publicTicketLink(cfg, settings.public_url);
+    root.innerHTML = String(html`
+      ${setup ? html`<a class="back-link" href="/">${ic('arrow-left', 'sm')} Voltar ao login</a>` : ''}
+      <div class="page-header"><div><h1>Configurações</h1><p class="sub">Conexão com o banco de dados, atendimento e link público de chamados</p></div></div>
+      <div class="stack" style="gap:24px">
+
+        <div class="card">
+          <div class="card-header"><div><h3>${ic('plug', 'sm')} Banco de dados</h3><p class="sub">Onde os dados do SystemHub ficam salvos</p></div>
+            ${remote ? badge('Conectado ao Supabase', 'ok') : badge('Modo local (este navegador)', 'demo')}</div>
+          <div class="card-body stack">
+            <p class="small">${remote
+              ? html`Os dados ficam no seu projeto Supabase <code>${cfg.supabaseUrl}</code>, compartilhados com toda a equipe, com login pelo Supabase e regras de segurança no banco.`
+              : html`Hoje os dados ficam <strong>somente neste navegador</strong>. Conecte ao Supabase para compartilhar com a equipe e receber chamados pelo link público de qualquer lugar.`}</p>
+            ${cfg.fixed ? html`<p class="notice">${ic('lock', 'sm')} A conexão está fixada no arquivo script.js (SUPABASE_URL e SUPABASE_ANON_KEY).</p>` : (!logged || admin) ? html`
+              <form class="grid cols-2" id="sbform" novalidate>
+                ${field('URL do projeto (Project URL)', html`<input class="input" name="supabaseUrl" value="${cfg.supabaseUrl}" placeholder="https://abcdefgh.supabase.co" />`, { hint: 'Supabase → Project Settings → Data API' })}
+                ${field('Chave pública (anon public key)', html`<input class="input mono" name="supabaseKey" value="${cfg.anonKey}" placeholder="eyJhbGciOi…" autocomplete="off" />`, { hint: 'Supabase → Project Settings → API Keys. Nunca use a chave service_role aqui.' })}
+                <div class="span-all row wrap">
+                  <button class="btn" type="button" data-test>${ic('activity', 'sm')} Testar conexão</button>
+                  <button class="btn primary" type="submit">${ic('save', 'sm')} Salvar e conectar</button>
+                  ${remote ? html`<button class="btn ghost" type="button" data-local>Voltar ao modo local</button>` : ''}
+                  <span class="small" id="testres"></span>
+                </div>
+              </form>` : html`<p class="muted small">Somente administradores alteram a conexão.</p>`}
+          </div>
+        </div>
+
+        ${!logged || admin ? html`<div class="card">
+          <div class="card-header"><div><h3>${ic('book-open', 'sm')} Como conectar ao Supabase (passo a passo)</h3><p class="sub">Leva uns 5 minutos e é gratuito</p></div></div>
+          <div class="card-body stack">
+            ${step(1, 'Crie o projeto', html`Acesse <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">supabase.com/dashboard</a>, clique em <strong>New project</strong>, escolha nome e senha do banco e a região <em>South America (São Paulo)</em>.`)}
+            ${step(2, 'Instale as tabelas', html`No menu <strong>SQL Editor</strong>, cole o script abaixo e clique em <strong>Run</strong>. Ele cria as tabelas e as regras de segurança (pode rodar de novo sem perder dados).`)}
+            ${step(3, 'Ajuste o login por e-mail', html`Em <strong>Authentication → Sign In / Providers → Email</strong>, desative <strong>Confirm email</strong> (ou confirme pelo e-mail que chegar). Assim as contas criadas aqui já entram direto.`)}
+            ${step(4, 'Copie URL e chave', html`Em <strong>Project Settings</strong>, copie a <strong>Project URL</strong> e a chave <strong>anon public</strong>, cole no formulário acima e clique em <strong>Salvar e conectar</strong>.`)}
+            ${step(5, 'Crie o administrador', html`Na primeira conexão, crie a conta do administrador logo abaixo. Depois, cadastre a equipe em <strong>Usuários e acessos</strong>.`)}
+            <div>
+              <div class="row between mb-4" style="margin-bottom:8px"><span class="label" style="margin:0">Script SQL de instalação</span>
+                <button class="btn sm" data-copy-sql>${ic('copy', 'sm')} Copiar script SQL</button></div>
+              <textarea class="input mono" readonly style="min-height:220px" id="sqlbox">${cfg.sql}</textarea>
+            </div>
+          </div>
+        </div>` : ''}
+
+        ${remote && !logged ? html`<div class="card" id="firstadmin">
+          <div class="card-header"><div><h3>${ic('shield-check', 'sm')} Primeiro administrador</h3><p class="sub">Use somente na primeira vez, com o banco recém-instalado</p></div></div>
+          <form class="card-body grid cols-2" id="adminform" novalidate>
+            ${field('E-mail', html`<input class="input" type="email" name="email" autocomplete="username" />`)}
+            ${field('Senha (mín. 8 caracteres)', html`<input class="input" type="password" name="password" autocomplete="new-password" />`)}
+            <div class="span-all row"><button class="btn primary" type="submit">${ic('user-plus', 'sm')} Criar conta de administrador</button><span class="small" id="adminres"></span></div>
+          </form>
+        </div>` : ''}
+
+        ${admin ? html`<div class="card">
+          <div class="card-header"><div><h3>${ic('whatsapp', 'sm')} Atendimento e link público</h3><p class="sub">Quem tiver o link abre chamados sem precisar de login</p></div></div>
+          <form class="card-body stack" id="setform" novalidate>
+            <div class="grid cols-2">
+              ${field('Seu WhatsApp (para receber os resumos)', html`<input class="input" name="owner_whatsapp" value="${settings.owner_whatsapp ?? ''}" placeholder="(11) 99999-9999" inputmode="tel" />`, { hint: 'Usado no botão “Enviar para mim” ao concluir chamados.' })}
+              ${field('Endereço onde o SystemHub está publicado (opcional)', html`<input class="input" name="public_url" value="${settings.public_url ?? ''}" placeholder="https://suaempresa.github.io/systemhub/" />`, { hint: 'Necessário para pessoas de fora acessarem o link.' })}
+            </div>
+            <div><button class="btn primary" type="submit">${ic('save', 'sm')} Salvar</button></div>
+            <div>
+              <span class="label">Link para abrir chamados</span>
+              <div class="row"><input class="input mono" readonly value="${link}" id="plink" />
+                <button class="btn" type="button" data-copy-link>${ic('copy', 'sm')} Copiar</button>
+                <a class="btn" href="${link}" target="_blank" rel="noopener noreferrer">${ic('external-link', 'sm')} Abrir</a></div>
+              <p class="xs muted mt-2">${!settings.public_url
+                ? html`⚠️ Este link aponta para o arquivo no seu computador e só funciona aqui. Para clientes abrirem de qualquer lugar, publique a pasta do SystemHub (ex.: GitHub Pages, Netlify ou Vercel — gratuitos), informe o endereço acima${remote ? '' : ' e conecte ao Supabase'}.`
+                : remote ? 'Pronto para compartilhar: envie por WhatsApp, e-mail ou coloque no seu site.' : '⚠️ No modo local os chamados ficam só neste navegador. Conecte ao Supabase para receber chamados de outras pessoas.'}</p>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div><h3>${ic('database', 'sm')} Dados demonstrativos</h3><p class="sub">Exemplos fictícios para conhecer o sistema</p></div></div>
+          <div class="card-body row wrap">
+            ${remote
+              ? html`<button class="btn" data-demo>${ic('download', 'sm')} Carregar dados de demonstração no Supabase</button><span class="xs muted">Adiciona sistemas, clientes, chamados e backups fictícios (marcados como “Fictício”).</span>`
+              : html`<button class="btn" data-reset style="color:#e11d48">${ic('refresh-cw', 'sm')} Restaurar demonstração (apaga tudo deste navegador)</button>`}
+          </div>
+        </div>` : ''}
+      </div>`);
+    bind(cfg);
+  };
+
+  const bind = (cfg) => {
+    const sb = root.querySelector('#sbform');
+    const values = () => Object.fromEntries(new FormData(sb));
+    root.querySelector('[data-test]')?.addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      const out = root.querySelector('#testres');
+      try {
+        const r = await api.post('/config/test', values());
+        out.innerHTML = String(html`<span class="text-ok strong">✓ Conectado. Tabelas instaladas.${r.hasUsers ? '' : ' Nenhum administrador ainda.'}</span>`);
+      } catch (err) {
+        out.innerHTML = String(html`<span class="text-bad">${err.message}</span>`);
+      }
+    }));
+    sb?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      busy(sb.querySelector('[type=submit]'), async () => {
+        try {
+          const v = values();
+          if (!v.supabaseUrl || !v.supabaseKey) return toast('Informe a URL e a chave do projeto.', 'error');
+          await api.post('/config/test', v);
+          await api.put('/config', v);
+          toast('Conectado ao Supabase');
+          state.user = null;
+          state.permissions = [];
+          location.hash = '#/configuracao';
+          location.reload();
+        } catch (err) { toast(err.message, 'error'); }
+      });
+    });
+    root.querySelector('[data-local]')?.addEventListener('click', async () => {
+      if (!(await confirmDialog({ title: 'Voltar ao modo local', confirmLabel: 'Desconectar', message: 'O SystemHub vai usar os dados salvos neste navegador. Os dados no Supabase continuam lá e voltam ao reconectar.' }))) return;
+      await api.put('/config', { supabaseUrl: '', supabaseKey: '' });
+      location.hash = '#/';
+      location.reload();
+    });
+    root.querySelector('[data-copy-sql]')?.addEventListener('click', () => copyText(cfg.sql));
+    root.querySelector('#adminform')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      busy(form.querySelector('[type=submit]'), async () => {
+        const out = root.querySelector('#adminres');
+        try {
+          await api.post('/config/first-admin', Object.fromEntries(new FormData(form)));
+          out.innerHTML = String(html`<span class="text-ok strong">✓ Conta criada! Volte ao login e entre com este e-mail e senha.</span>`);
+          toast('Administrador criado. Faça login.');
+        } catch (err) {
+          out.innerHTML = String(html`<span class="text-bad">${err.message}</span>`);
+        }
+      });
+    });
+    root.querySelector('#setform')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      busy(form.querySelector('[type=submit]'), async () => {
+        try {
+          await api.put('/settings', Object.fromEntries(new FormData(form)));
+          toast('Configurações salvas');
+          await load();
+        } catch (err) { toast(err.message, 'error'); }
+      });
+    });
+    root.querySelector('[data-copy-link]')?.addEventListener('click', () => copyText(root.querySelector('#plink').value));
+    root.querySelector('[data-demo]')?.addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      try {
+        await api.post('/settings/demo-data');
+        invalidate('systems-meta', 'systems-options', 'clients-options');
+        toast('Dados demonstrativos carregados');
+      } catch (err) { toast(err.message, 'error'); }
+    }));
+    root.querySelector('[data-reset]')?.addEventListener('click', async () => {
+      if (!(await confirmDialog({ title: 'Restaurar demonstração', danger: true, confirmLabel: 'Apagar e restaurar', message: 'Todos os dados deste navegador serão apagados e substituídos pelos dados fictícios de demonstração.' }))) return;
+      await api.post('/settings/reset-local');
+      location.hash = '#/';
+      location.reload();
+    });
+  };
+
+  root.innerHTML = String(skeleton(120, 3));
+  try {
+    await load();
+  } catch (err) {
+    root.innerHTML = String(errorState(err));
+  }
+}
+
+window.Pages = window.Pages || {};
+window.Pages['settings'] = render;
+})();
+
+// ===================== page-public-ticket =====================
+// Página: formulário público para abrir chamado (não exige login)
+(function () {
+async function render(root) {
+  const draw = (systems) => {
+    root.innerHTML = String(html`
+      <div class="public-wrap">
+        <div class="public-card card">
+          <div class="public-head">
+            <span class="brand-mark">${ic('shield-check')}</span>
+            <div><h1>Abrir um chamado</h1><p class="muted">Tem uma dúvida, encontrou um problema ou quer sugerir uma melhoria? Conte para a gente.</p></div>
+          </div>
+          <form class="grid cols-2" novalidate id="pform">
+            ${field('Seu nome *', html`<input class="input" name="requester_name" maxlength="120" autocomplete="name" autofocus />`)}
+            ${field('Seu WhatsApp (com DDD) *', html`<input class="input" name="requester_phone" maxlength="30" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="tel" />`, { hint: 'Enviaremos o resumo do atendimento por aqui.' })}
+            ${field('E-mail', html`<input class="input" type="email" name="requester_email" autocomplete="email" />`)}
+            ${field('Empresa', html`<input class="input" name="requester_company" maxlength="120" autocomplete="organization" />`)}
+            ${field('Tipo de solicitação *', html`<select class="input" name="type">${options([
+              ['question', 'Dúvida'], ['bug', 'Algo não está funcionando'], ['improvement', 'Sugestão de melhoria'], ['feature', 'Nova funcionalidade'], ['incident', 'Sistema fora do ar'],
+            ], 'question')}</select>`)}
+            ${field('Sistema', html`<select class="input" name="system_id">${options(systems.map((s) => [s.id, s.name]), '', { empty: 'Não sei / outro' })}</select>`)}
+            ${field('Assunto *', html`<input class="input" name="title" maxlength="200" placeholder="Resuma em uma frase" />`, { cls: 'span-all' })}
+            ${field('Descreva com detalhes *', html`<textarea class="input" name="description" style="min-height:140px" maxlength="5000" placeholder="O que aconteceu? O que você esperava? Se possível, informe o número do pedido, a tela e o horário."></textarea>`, { cls: 'span-all' })}
+            <p class="form-error small span-all" hidden></p>
+            <div class="span-all row between wrap">
+              <p class="xs muted">Seus dados são usados apenas para o atendimento deste chamado.</p>
+              <button class="btn primary" type="submit">${ic('send', 'sm')} Enviar chamado</button>
+            </div>
+          </form>
+        </div>
+        <p class="xs muted center mt-4">SystemHub · Central de atendimento</p>
+      </div>`);
+
+    const form = root.querySelector('#pform');
+    const err = root.querySelector('.form-error');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.hidden = true;
+      const body = Object.fromEntries(new FormData(form));
+      const missing = [['requester_name', 'seu nome'], ['requester_phone', 'seu WhatsApp'], ['title', 'o assunto'], ['description', 'a descrição']].find(([k]) => !String(body[k] ?? '').trim());
+      if (missing) {
+        err.textContent = `Informe ${missing[1]}.`;
+        err.hidden = false;
+        form.querySelector(`[name=${missing[0]}]`).focus();
+        return;
+      }
+      await busy(form.querySelector('[type=submit]'), async () => {
+        try {
+          const r = await api.post('/public/tickets', body);
+          success(r.id, body);
+        } catch (ex) {
+          err.textContent = ex.message;
+          err.hidden = false;
+        }
+      });
+    });
+  };
+
+  const success = (id, body) => {
+    root.innerHTML = String(html`
+      <div class="public-wrap">
+        <div class="public-card card center" style="padding:48px 32px">
+          <div class="e-icon" style="margin:0 auto 16px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--ok-bg);color:var(--ok)">${ic('check-circle', 'lg')}</div>
+          <h1 style="font-size:22px">Chamado enviado!</h1>
+          <p class="muted mt-2">Seu protocolo é <strong style="color:var(--text)">#${id}</strong>.</p>
+          <p class="muted mt-1">Obrigado, ${body.requester_name.split(' ')[0]}. Quando o atendimento for concluído, você receberá o resumo no WhatsApp ${body.requester_phone}.</p>
+          <button class="btn mt-6" data-again>${ic('plus', 'sm')} Abrir outro chamado</button>
+        </div>
+      </div>`);
+    root.querySelector('[data-again]').addEventListener('click', () => render(root));
+  };
+
+  root.innerHTML = String(html`<div class="public-wrap"><div class="public-card card card-body center"><span class="spinner"></span></div></div>`);
+  let systems = [];
+  try {
+    systems = await api.get('/public/systems');
+  } catch (ex) {
+    if (/configurado|conectar|tabelas|chave/i.test(ex.message)) {
+      root.innerHTML = String(html`<div class="public-wrap"><div class="public-card card">${emptyState('Formulário indisponível', `Não foi possível conectar à central de atendimento. ${ex.message}`, 'alert-triangle')}</div></div>`);
+      return;
+    }
+  }
+  draw(systems ?? []);
+}
+
+window.Pages = window.Pages || {};
+window.Pages['public-ticket'] = render;
+})();
 
 // ===================== app =====================
 // ---------- estado global ----------
@@ -3632,19 +5428,31 @@ const ROUTES = [
   { re: /^\/monitoring$/, page: 'monitoring', perm: 'monitoring:view' },
   { re: /^\/tickets$/, page: 'tickets' },
   { re: /^\/people$/, page: 'people' },
+  { re: /^\/clients$/, page: 'clients', perm: 'clients:view' },
+  { re: /^\/backups$/, page: 'backups', perm: 'backups:view' },
   { re: /^\/users$/, page: 'users', perm: 'users:manage' },
   { re: /^\/audit$/, page: 'audit', perm: 'audit:view' },
+  { re: /^\/configuracao$/, page: 'settings', perm: 'settings:manage' },
 ];
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: 'layout-dashboard' },
   { to: '/systems', label: 'Catálogo de sistemas', icon: 'layout-grid' },
   { to: '/monitoring', label: 'Monitoramento', icon: 'activity', perm: 'monitoring:view' },
+  { to: '/backups', label: 'Backups', icon: 'hard-drive', perm: 'backups:view' },
   { to: '/tickets', label: 'Chamados', icon: 'kanban' },
+  { to: '/clients', label: 'Clientes', icon: 'briefcase', perm: 'clients:view' },
   { to: '/people', label: 'Responsáveis', icon: 'contact' },
   { to: '/users', label: 'Usuários e acessos', icon: 'users', perm: 'users:manage' },
   { to: '/audit', label: 'Auditoria', icon: 'scroll-text', perm: 'audit:view' },
+  { to: '/configuracao', label: 'Configurações', icon: 'settings', perm: 'settings:manage' },
 ];
+
+/** Telas que abrem sem login e sem o menu lateral. */
+function renderStandalone(page, opts = {}) {
+  document.getElementById('app').innerHTML = '<div class="standalone"><div class="page"></div></div>';
+  return window.Pages[page](document.querySelector('#app .page'), opts);
+}
 
 // ---------- navegação ----------
 let cleanup = null;
@@ -3689,6 +5497,21 @@ async function route() {
   cleanup?.();
   cleanup = null;
   document.getElementById('overlays').innerHTML = '';
+  const current = currentRoute();
+  // Formulário público de chamados: sempre sem login
+  if (current.path === '/abrir-chamado') {
+    const c = current.query.get('c');
+    if (c) {
+      try {
+        const { u, k } = JSON.parse(atob(c));
+        if (!getConfig().fixed) applyConfigOverride({ supabaseUrl: u, supabaseKey: k });
+      } catch {
+        /* link inválido: segue com a configuração local */
+      }
+    }
+    return renderStandalone('public-ticket');
+  }
+  if (!state.user && current.path === '/configuracao') return renderStandalone('settings', { setup: true });
   if (!state.user) return renderLogin();
   if (!$('.app')) renderShell();
   highlightNav();
@@ -3908,6 +5731,7 @@ function openPalette() {
         ...d.systems.map((s) => ({ group: 'Sistemas', to: `/systems/${s.id}`, body: html`${sysIcon(s.icon, s.color, 'sm')}<span class="grow truncate">${s.name} <span class="muted small">· ${s.category}</span></span><span class="status-dot c-${s.status}" title="${STATUS[s.status].label}"></span>` })),
         ...d.tickets.map((t) => ({ group: 'Chamados', to: `/tickets?open=${t.id}`, body: html`${ic('kanban', 'sm')}<span class="grow truncate">#${t.id} ${t.title}</span><span class="muted small">${TICKET_STATUS[t.status].label}</span>` })),
         ...d.people.map((p) => ({ group: 'Responsáveis', to: `/people?highlight=${p.id}`, body: html`${ic('user', 'sm')}<span class="grow truncate">${p.name} <span class="muted small">· ${p.title ?? p.email ?? ''}</span></span>` })),
+        ...(d.clients ?? []).map((c) => ({ group: 'Clientes', to: `/clients?open=${c.id}`, body: html`${ic('briefcase', 'sm')}<span class="grow truncate">${c.name} <span class="muted small">· ${c.document ?? c.contact_name ?? ''}</span></span>` })),
       ];
       active = 0;
       results.innerHTML = items.length
@@ -3981,4 +5805,3 @@ setUnauthorizedHandler(() => {
   }
   route();
 })();
-
