@@ -1207,6 +1207,9 @@ function sbErrorMessage(status, d) {
   const raw = d?.msg || d?.message || d?.error_description || d?.error || `Erro ${status} no Supabase`;
   const code = d?.code ?? '';
   if (/Invalid login credentials/i.test(raw)) return 'E-mail ou senha inválidos';
+  if (d?.error_code === 'email_provider_disabled' || /Email logins are disabled|Email signups are disabled/i.test(raw)) {
+    return 'O login por e-mail está desligado no Supabase. Ligue em Authentication → Sign In / Providers → Email → "Enable Email provider" (deixe só o "Confirm email" desligado).';
+  }
   if (/Email not confirmed/i.test(raw)) return 'E-mail ainda não confirmado. Abra o link enviado por e-mail ou desative "Confirm email" no Supabase (Authentication → Sign In / Providers → Email).';
   if (/already registered|already been registered/i.test(raw)) return 'Este e-mail já tem cadastro no Supabase.';
   if (code === '42P01' || code === 'PGRST205' || /does not exist|Could not find the table/i.test(raw)) return 'As tabelas do SystemHub não existem no Supabase. Execute o script de instalação (Configurações → Script SQL).';
