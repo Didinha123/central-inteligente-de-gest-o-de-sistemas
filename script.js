@@ -632,8 +632,8 @@ function barChart(el, data, { onSelect } = {}) {
 // Opção 2 (para hospedar e compartilhar com a equipe): preencha aqui.
 // A chave "anon public" pode ficar no navegador — a proteção é feita pelo RLS do banco.
 // ---------------------------------------------------------------------
-const SUPABASE_URL = ''; // ex.: 'https://abcdefgh.supabase.co'
-const SUPABASE_ANON_KEY = ''; // ex.: 'eyJhbGciOi...'
+const SUPABASE_URL = 'https://ziklieantgvepcipvvkl.supabase.co'; // ex.: 'https://abcdefgh.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_nHCDbCwDhvYrhVJfU5f9ew_IyXkVS-V'; // ex.: 'eyJhbGciOi...'
 
 const DB_KEY = 'systemhub-db-v1';
 const CONFIG_KEY = 'systemhub-config';
