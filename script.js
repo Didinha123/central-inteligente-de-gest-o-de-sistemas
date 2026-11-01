@@ -617,7 +617,7 @@ function barChart(el, data, { onSelect } = {}) {
 
 // ===================== database =====================
 // =====================================================================
-// Banco de dados do SystemHub
+// Banco de dados do NEXORA
 //  • Modo LOCAL: dados salvos neste navegador (localStorage) — ideal para demonstração.
 //  • Modo SUPABASE: dados salvos no seu projeto Supabase (PostgreSQL na nuvem), compartilhados
 //    por toda a equipe, com login pelo Supabase Auth e regras de acesso (RLS) no banco.
@@ -645,7 +645,7 @@ const agoIso = (ms) => new Date(Date.now() - ms).toISOString();
 const TABLES = [
   'users', 'teams', 'people', 'systems', 'system_contacts', 'system_access', 'system_versions', 'health_checks',
   'incidents', 'tickets', 'ticket_events', 'favorites', 'recent_access', 'notifications', 'audit_logs',
-  'clients', 'backup_jobs', 'backup_runs', 'settings',
+  'clients', 'backup_jobs', 'backup_runs', 'settings', 'subscriptions', 'subscription_payments',
 ];
 
 let DB = null;
@@ -825,6 +825,20 @@ const SEED_CLIENTS = [
   ['João Pedro Andrade', 'PF', '123.456.789-09', 'João Pedro Andrade', 'joao.andrade@exemplo.com', '(51) 94444-7890', 'Porto Alegre', 'RS', 'active', ['base-conhecimento'], ''],
 ];
 
+// sistema, tipo, descrição/domínio, fornecedor, valor, ciclo, dias até o vencimento, renovação automática, cliente (índice)
+const SEED_SUBSCRIPTIONS = [
+  ['portal-financeiro', 'domain', 'portalfinanceiro.exemplo.com.br', 'Registro.br', 40, 'yearly', 23, true, 0],
+  ['portal-financeiro', 'hosting', 'Hospedagem VPS 4 GB', 'Hostinger', 89.9, 'monthly', 5, true, 0],
+  ['ecommerce-b2b', 'domain', 'lojab2b.exemplo.com.br', 'Registro.br', 40, 'yearly', -3, false, 1],
+  ['ecommerce-b2b', 'hosting', 'Servidor dedicado + CDN', 'AWS', 640, 'monthly', 12, true, 1],
+  ['ecommerce-b2b', 'ssl', 'Certificado SSL wildcard', 'Sectigo', 690, 'yearly', 140, false, 1],
+  ['crm-vendas', 'license', 'Licenças CRM (15 usuários)', 'Fornecedor CRM', 1350, 'monthly', 2, true, 2],
+  ['base-conhecimento', 'domain', 'ajuda.exemplo.com', 'GoDaddy', 89, 'yearly', 200, true, 4],
+  ['base-conhecimento', 'hosting', 'Hospedagem compartilhada', 'Locaweb', 34.9, 'monthly', 18, true, 4],
+  ['email-marketing', 'fee', 'Plano de disparos 50 mil e-mails', 'Plataforma de e-mail', 249, 'monthly', -1, false, 2],
+  ['agenda-salas', 'fee', 'Mensalidade do sistema', 'Fornecedor SaaS', 120, 'monthly', 9, true, null],
+];
+
 // sistema, nome da rotina, tipo, frequência, destino, retenção (dias), responsável, perfil da simulação
 const SEED_BACKUPS = [
   ['erp-corporativo', 'Banco Oracle — completo', 'full', 'daily', 'Storage S3 (região sa-east-1)', 30, 7, 'ok'],
@@ -875,7 +889,7 @@ async function seedDemo({ merge = false } = {}) {
       status_updated_at: agoIso(2 * DAY), version, last_update_at: agoIso(days * DAY), criticality: crit,
       technologies: tech, data_sources: sources, integrations: integ,
       documentation_url: `https://docs.exemplo.com/${slug}`,
-      documentation: `## ${name}\n\n> Documento fictício para demonstração.\n\n### Visão geral\n${desc}\n\n### Como acessar\nUse o SSO corporativo. Perfis são concedidos via **Gestão de Acessos (IAM)**.\n\n### Suporte\n- Abra um chamado no SystemHub vinculado a este sistema\n- Em incidentes críticos, acione o responsável técnico`,
+      documentation: `## ${name}\n\n> Documento fictício para demonstração.\n\n### Visão geral\n${desc}\n\n### Como acessar\nUse o SSO corporativo. Perfis são concedidos via **Gestão de Acessos (IAM)**.\n\n### Suporte\n- Abra um chamado no NEXORA vinculado a este sistema\n- Em incidentes críticos, acione o responsável técnico`,
       healthcheck_url: null, monitoring_enabled: true, pending_update: !!extra.pending, restricted: !!extra.restricted,
       data_origin: 'demo', last_check_at: null, last_latency_ms: null, created_at: agoIso(400 * DAY), updated_at: agoIso(days * DAY),
     });
@@ -992,10 +1006,31 @@ async function seedDemo({ merge = false } = {}) {
     Object.assign(job, { last_run_at: last?.finished_at ?? null, last_status: last?.status ?? 'never', last_success_at: lastOk?.finished_at ?? null, last_size_mb: lastOk?.size_mb ?? null });
   }
 
+  // ---- domínios e mensalidades (fictícios) ----
+  const CYCLE_MONTHS = { monthly: 1, quarterly: 3, semiannual: 6, yearly: 12 };
+  for (const [slug, kind, name, provider, amount, cycle, dueIn, autoRenew, ci] of SEED_SUBSCRIPTIONS) {
+    const due = new Date(Date.now() + dueIn * DAY).toISOString().slice(0, 10);
+    const sub = insert('subscriptions', {
+      system_id: ids[slug] ?? null, client_id: ci == null ? null : clientIds[ci], kind, name, provider, amount, cycle, next_due: due,
+      auto_renew: autoRenew, payment_method: autoRenew ? 'Cartão de crédito' : 'Boleto', active: true, notes: 'Cobrança fictícia para demonstração.',
+      is_demo: true, created_at: agoIso(300 * DAY), updated_at: agoIso(10 * DAY),
+    });
+    // últimos pagamentos (3 ciclos anteriores)
+    for (let i = 1; i <= 3; i++) {
+      const d = new Date(due + 'T12:00:00Z');
+      d.setUTCMonth(d.getUTCMonth() - i * CYCLE_MONTHS[cycle]);
+      if (d.getTime() > Date.now()) continue;
+      insert('subscription_payments', {
+        subscription_id: sub.id, due_date: d.toISOString().slice(0, 10), paid_at: d.toISOString(), amount, method: sub.payment_method,
+        notes: null, created_by: null,
+      });
+    }
+  }
+
   if (!DB.settings.some((s) => s.key === 'owner_whatsapp')) insert('settings', { key: 'owner_whatsapp', value: '' });
 
   insert('notifications', { user_id: adminId, type: 'incident', title: 'Legado Contábil está indisponível [simulado]', message: 'Falha simulada (dado demonstrativo)', link: `/systems/${legacy.id}`, read_at: null, created_at: agoIso(6 * HOUR) });
-  insert('notifications', { user_id: adminId, type: 'info', title: 'Bem-vindo ao SystemHub', message: 'Os dados exibidos são fictícios e servem apenas para demonstração.', link: '/', read_at: null, created_at: agoIso(DAY) });
+  insert('notifications', { user_id: adminId, type: 'info', title: 'Bem-vindo ao NEXORA', message: 'Os dados exibidos são fictícios e servem apenas para demonstração.', link: '/', read_at: null, created_at: agoIso(DAY) });
   insert('audit_logs', { user_id: null, user_name: 'Sistema', action: 'seed', entity: 'system', entity_id: null, summary: 'Dados demonstrativos (fictícios) carregados', details: null, ip: null, created_at: nowIso() });
   saveDb();
 }
@@ -1061,18 +1096,22 @@ const SB_COLUMNS = {
     'notes', 'last_run_at', 'last_status', 'last_success_at', 'last_size_mb', 'is_demo', 'created_at', 'updated_at'],
   backup_runs: ['id', 'job_id', 'started_at', 'finished_at', 'status', 'size_mb', 'notes', 'source', 'created_by'],
   settings: ['id', 'key', 'value'],
+  subscriptions: ['id', 'system_id', 'client_id', 'kind', 'name', 'provider', 'amount', 'cycle', 'next_due', 'auto_renew', 'payment_method',
+    'active', 'notes', 'is_demo', 'created_at', 'updated_at'],
+  subscription_payments: ['id', 'subscription_id', 'due_date', 'paid_at', 'amount', 'method', 'notes', 'created_by'],
 };
 
 const SB_TYPES = {
   id: 'bigint primary key', auth_id: 'uuid unique', entity_id: 'text', created_by: 'bigint', technologies: 'jsonb', data_sources: 'jsonb', integrations: 'jsonb', details: 'jsonb',
   system_ids: 'jsonb', active: 'boolean', is_demo: 'boolean', monitoring_enabled: 'boolean', pending_update: 'boolean', restricted: 'boolean',
   ok: 'boolean', position: 'double precision', size_mb: 'double precision', last_size_mb: 'double precision',
+  amount: 'numeric(12,2)', auto_renew: 'boolean',
 };
 const sbColType = (c) => SB_TYPES[c] ?? (/_id$|_ms$|_code$|_days$/.test(c) ? 'bigint' : 'text');
 
 /** Script de instalação: tabelas, funções, gatilhos e políticas de segurança (RLS). */
 const SUPABASE_SETUP_SQL = `-- =============================================================
--- SystemHub — instalação no Supabase
+-- NEXORA — instalação no Supabase
 -- Cole tudo no "SQL Editor" do seu projeto e clique em RUN.
 -- Pode ser executado de novo sem perder dados.
 -- =============================================================
@@ -1129,6 +1168,13 @@ end $$;
 drop trigger if exists sh_public_ticket on public.tickets;
 create trigger sh_public_ticket after insert on public.tickets for each row execute function public.sh_public_ticket();
 
+-- WhatsApp de atendimento exibido no formulário público (somente o número)
+create or replace function public.sh_public_contact() returns text
+language sql stable security definer set search_path = public as $$
+  select nullif(value, '') from public.settings where key = 'owner_whatsapp' limit 1
+$$;
+grant execute on function public.sh_public_contact() to anon, authenticated;
+
 -- Lista de sistemas exibida no formulário público (apenas id e nome dos não restritos)
 create or replace view public.public_systems as
   select id, name from public.systems where coalesce(restricted, false) = false order by name;
@@ -1148,7 +1194,7 @@ begin
   end loop;
 
   -- Tabelas administradas pela equipe (admin, gestor, desenvolvedor)
-  foreach t in array array['teams','people','systems','system_contacts','system_access','system_versions','health_checks','incidents','clients','backup_jobs','backup_runs','settings'] loop
+  foreach t in array array['teams','people','systems','system_contacts','system_access','system_versions','health_checks','incidents','clients','backup_jobs','backup_runs','settings','subscriptions','subscription_payments'] loop
     execute format('create policy sh_select on public.%I for select to authenticated using (public.sh_role() is not null)', t);
     execute format('create policy sh_insert on public.%I for insert to authenticated with check (public.sh_role() in (''admin'',''manager'',''developer''))', t);
     execute format('create policy sh_update on public.%I for update to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
@@ -1212,7 +1258,7 @@ function sbErrorMessage(status, d) {
   }
   if (/Email not confirmed/i.test(raw)) return 'E-mail ainda não confirmado. Abra o link enviado por e-mail ou desative "Confirm email" no Supabase (Authentication → Sign In / Providers → Email).';
   if (/already registered|already been registered/i.test(raw)) return 'Este e-mail já tem cadastro no Supabase.';
-  if (code === '42P01' || code === 'PGRST205' || /does not exist|Could not find the table/i.test(raw)) return 'As tabelas do SystemHub não existem no Supabase. Execute o script de instalação (Configurações → Script SQL).';
+  if (code === '42P01' || code === 'PGRST205' || /does not exist|Could not find the table/i.test(raw)) return 'As tabelas do NEXORA não existem no Supabase. Execute o script de instalação (Configurações → Script SQL).';
   if (code === '42501' || /row-level security/i.test(raw)) return 'Permissão negada pelo Supabase (regras de segurança/RLS).';
   if (/Invalid API key|No API key/i.test(raw)) return 'Chave do Supabase inválida. Confira a "anon public key" em Configurações.';
   return raw;
@@ -1352,7 +1398,7 @@ async function flushSync() {
 
 // ===================== api =====================
 // =====================================================================
-// API local do SystemHub — roda inteiramente no navegador.
+// API local do NEXORA — roda inteiramente no navegador.
 // Mantém as mesmas rotas/respostas de uma API REST, aplicando validação,
 // permissões por perfil, auditoria, notificações e monitoramento.
 // =====================================================================
@@ -1390,6 +1436,8 @@ async function flushSync() {
     'backups:view': ['admin', 'manager', 'developer'],
     'backups:manage': ['admin', 'developer'],
     'settings:manage': ['admin'],
+    'billing:view': ['admin', 'manager'],
+    'billing:manage': ['admin', 'manager'],
   };
   const allowed = (user, perm) => !!user && PERMISSIONS[perm].includes(user.role);
   const permissionsFor = (role) => Object.keys(PERMISSIONS).filter((p) => PERMISSIONS[p].includes(role));
@@ -1700,6 +1748,7 @@ async function flushSync() {
     DB.backup_jobs = DB.backup_jobs.filter((j) => !jobs.has(j.id));
     DB.backup_runs = DB.backup_runs.filter((r) => !jobs.has(r.job_id));
     for (const c of DB.clients) if ((c.system_ids ?? []).includes(id)) c.system_ids = c.system_ids.filter((x) => x !== id);
+    for (const s of DB.subscriptions) if (s.system_id === id) s.system_id = null;
   }
 
   // ---------- chamados ----------
@@ -1794,7 +1843,7 @@ async function flushSync() {
       }
       if (!u || !u.active) {
         await sbSignOut();
-        fail(403, 'Seu login existe, mas não há um perfil ativo no SystemHub. Peça a um administrador para cadastrar você em Usuários e acessos.');
+        fail(403, 'Seu login existe, mas não há um perfil ativo no NEXORA. Peça a um administrador para cadastrar você em Usuários e acessos.');
       }
       u.auth_id = s.user.id; // vincula perfil pré-cadastrado pelo administrador
       u.last_login_at = nowIso();
@@ -1879,6 +1928,15 @@ async function flushSync() {
   on('GET', '/public/systems', async () => {
     if (isRemote()) return sbFetch('/rest/v1/public_systems?select=id,name', { anon: true });
     return DB.systems.filter((s) => !s.restricted).map((s) => ({ id: s.id, name: s.name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, { pub: true });
+
+  /** WhatsApp de atendimento exibido no formulário público (somente o número, nada mais). */
+  on('GET', '/public/contact', async () => {
+    if (isRemote()) {
+      const phone = await sbRpc('sh_public_contact', {}, true).catch(() => null);
+      return { whatsapp: phone || '' };
+    }
+    return { whatsapp: setting('owner_whatsapp') };
   }, { pub: true });
 
   on('POST', '/public/tickets', async ({ body }) => {
@@ -1971,6 +2029,9 @@ async function flushSync() {
       },
       backups: allowed(user, 'backups:view')
         ? DB.backup_jobs.reduce((acc, j) => { const h = backupHealth(j); if (h === 'late' || h === 'failed') acc[h]++; return acc; }, { late: 0, failed: 0 })
+        : null,
+      billing: allowed(user, 'billing:view')
+        ? DB.subscriptions.reduce((acc, s) => { const st = subStatus(s); if (st === 'overdue' || st === 'due_soon') acc[st]++; return acc; }, { overdue: 0, due_soon: 0 })
         : null,
       categories: groupBy('category').sort((a, b) => b.value - a.value || a.name.localeCompare(b.name)),
       origin: groupBy('data_origin'),
@@ -2579,6 +2640,7 @@ async function flushSync() {
     const c = byId('clients', intId(params.id)) ?? notFound('Cliente');
     DB.clients = DB.clients.filter((x) => x.id !== c.id);
     for (const t of DB.tickets) if (t.client_id === c.id) t.client_id = null;
+    for (const s of DB.subscriptions) if (s.client_id === c.id) s.client_id = null;
     audit(user, 'client.delete', 'client', c.id, `Cliente "${c.name}" excluído`);
     return { ok: true };
   });
@@ -2706,6 +2768,155 @@ async function flushSync() {
     return { id: r.id };
   });
 
+  // ---- domínios e mensalidades ----
+  const SUB_KINDS = ['domain', 'hosting', 'ssl', 'license', 'fee', 'other'];
+  const SUB_CYCLES = { monthly: 1, quarterly: 3, semiannual: 6, yearly: 12 };
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function daysUntil(date) {
+    return Math.round((Date.parse(`${date}T00:00:00`) - Date.parse(`${todayStr()}T00:00:00`)) / DAY);
+  }
+  /** Situação: ok (em dia), due_soon (vence em até 7 dias), overdue (vencida), inactive. */
+  function subStatus(s) {
+    if (!s.active) return 'inactive';
+    const d = daysUntil(s.next_due);
+    return d < 0 ? 'overdue' : d <= 7 ? 'due_soon' : 'ok';
+  }
+  function addCycle(date, cycle) {
+    const [y, m, d] = date.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1 + SUB_CYCLES[cycle], 1));
+    const last = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 0)).getUTCDate();
+    dt.setUTCDate(Math.min(d, last)); // ex.: 31/01 + 1 mês = 28 ou 29/02
+    return dt.toISOString().slice(0, 10);
+  }
+  const subView = (s) => {
+    const sys = s.system_id ? byId('systems', s.system_id) : null;
+    return {
+      ...s, amount: Number(s.amount), status: subStatus(s), days_left: daysUntil(s.next_due),
+      monthly_amount: Number(s.amount) / SUB_CYCLES[s.cycle],
+      system_name: sys?.name ?? null, system_icon: sys?.icon ?? null, system_color: sys?.color ?? null, client_name: nameOf('clients', s.client_id),
+      client_phone: s.client_id ? byId('clients', s.client_id)?.phone ?? null : null,
+    };
+  };
+  function billingSummary(list) {
+    const active = list.filter((s) => s.active);
+    const sum = (arr, f = (s) => s.amount) => Math.round(arr.reduce((a, s) => a + f(s), 0) * 100) / 100;
+    const overdue = active.filter((s) => s.status === 'overdue');
+    const next30 = active.filter((s) => s.days_left >= 0 && s.days_left <= 30);
+    return {
+      active: active.length,
+      monthly_total: sum(active, (s) => s.monthly_amount),
+      yearly_total: sum(active, (s) => s.monthly_amount * 12),
+      overdue: overdue.length, overdue_amount: sum(overdue),
+      due_soon: active.filter((s) => s.status === 'due_soon').length,
+      next30: next30.length, next30_amount: sum(next30),
+      domains: active.filter((s) => s.kind === 'domain').length,
+    };
+  }
+  const parseMoney = (v) => {
+    const s = String(v ?? '').trim();
+    return Number(s.includes(',') ? s.replace(/\./g, '').replace(',', '.') : s);
+  };
+  function parseSub(body) {
+    const v = validator(body);
+    const d = {
+      system_id: v.id('system_id') ?? null,
+      client_id: v.id('client_id') ?? null,
+      kind: v.oneOf('kind', SUB_KINDS, { required: true, label: 'Tipo' }),
+      name: v.str('name', { min: 2, max: 160, required: true, label: 'Domínio / descrição' }),
+      provider: v.str('provider', { max: 120 }) ?? null,
+      cycle: v.oneOf('cycle', Object.keys(SUB_CYCLES), { required: true, label: 'Periodicidade' }),
+      next_due: v.date('next_due'),
+      auto_renew: v.bool('auto_renew') ?? false,
+      payment_method: v.str('payment_method', { max: 60 }) ?? null,
+      active: v.bool('active') ?? true,
+      notes: v.str('notes', { max: 2000, trim: false }) ?? null,
+    };
+    v.done();
+    const amount = parseMoney(body.amount);
+    if (String(body.amount ?? '').trim() === '' || !Number.isFinite(amount) || amount < 0 || amount > 10_000_000) fail(400, 'Informe um valor válido (ex.: 49,90).');
+    d.amount = Math.round(amount * 100) / 100;
+    if (!d.next_due) fail(400, 'Informe a data do próximo vencimento.');
+    if (d.system_id && !byId('systems', d.system_id)) notFound('Sistema');
+    if (d.client_id && !byId('clients', d.client_id)) notFound('Cliente');
+    return d;
+  }
+
+  on('GET', '/subscriptions', ({ user, query }) => {
+    need(user, 'billing:view');
+    const all = DB.subscriptions.map(subView);
+    let list = all;
+    if (query.q) { const toks = tokens(query.q); list = list.filter((s) => matches(`${s.name} ${s.provider ?? ''} ${s.system_name ?? ''} ${s.client_name ?? ''}`, toks)); }
+    if (query.kind) list = list.filter((s) => s.kind === query.kind);
+    if (query.status) list = list.filter((s) => s.status === query.status);
+    if (query.system) list = list.filter((s) => s.system_id === Number(query.system));
+    if (query.client) list = list.filter((s) => s.client_id === Number(query.client));
+    const rank = { overdue: 0, due_soon: 1, ok: 2, inactive: 3 };
+    list.sort((a, b) => rank[a.status] - rank[b.status] || a.next_due.localeCompare(b.next_due));
+    return { items: list, summary: billingSummary(all) };
+  });
+
+  on('GET', '/subscriptions/:id', ({ user, params }) => {
+    need(user, 'billing:view');
+    const s = byId('subscriptions', intId(params.id)) ?? notFound('Cobrança');
+    return {
+      ...subView(s),
+      payments: DB.subscription_payments.filter((p) => p.subscription_id === s.id).sort((a, b) => b.paid_at.localeCompare(a.paid_at))
+        .map((p) => ({ ...p, amount: Number(p.amount), created_by_name: nameOf('users', p.created_by) })),
+    };
+  });
+
+  on('POST', '/subscriptions', ({ user, body }) => {
+    need(user, 'billing:manage');
+    const d = parseSub(body);
+    const s = insert('subscriptions', { ...d, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    audit(user, 'billing.create', 'subscription', s.id, `Cobrança "${d.name}" cadastrada (R$ ${d.amount.toFixed(2)})`);
+    return { id: s.id };
+  });
+
+  on('PUT', '/subscriptions/:id', ({ user, params, body }) => {
+    need(user, 'billing:manage');
+    const s = byId('subscriptions', intId(params.id)) ?? notFound('Cobrança');
+    const d = parseSub(body);
+    const changes = diff({ ...s, amount: Number(s.amount) }, d, Object.keys(d));
+    Object.assign(s, d, { updated_at: nowIso() });
+    if (Object.keys(changes).length) audit(user, 'billing.update', 'subscription', s.id, `Cobrança "${s.name}" atualizada (${Object.keys(changes).join(', ')})`, changes);
+    return { ok: true };
+  });
+
+  on('DELETE', '/subscriptions/:id', ({ user, params }) => {
+    need(user, 'billing:manage');
+    const s = byId('subscriptions', intId(params.id)) ?? notFound('Cobrança');
+    DB.subscriptions = DB.subscriptions.filter((x) => x.id !== s.id);
+    DB.subscription_payments = DB.subscription_payments.filter((p) => p.subscription_id !== s.id);
+    audit(user, 'billing.delete', 'subscription', s.id, `Cobrança "${s.name}" excluída`);
+    return { ok: true };
+  });
+
+  /** Registra o pagamento do vencimento atual e avança o vencimento para o próximo ciclo. */
+  on('POST', '/subscriptions/:id/pay', ({ user, params, body }) => {
+    need(user, 'billing:manage');
+    const s = byId('subscriptions', intId(params.id)) ?? notFound('Cobrança');
+    const v = validator(body);
+    const paidDate = v.date('paid_at') ?? todayStr();
+    const method = v.str('method', { max: 60 }) ?? s.payment_method ?? null;
+    const notes = v.str('notes', { max: 500 }) ?? null;
+    v.done();
+    if (paidDate > todayStr()) fail(400, 'A data do pagamento não pode ser no futuro.');
+    const amount = String(body.amount ?? '').trim() === '' ? Number(s.amount) : parseMoney(body.amount);
+    if (!Number.isFinite(amount) || amount < 0) fail(400, 'Valor pago inválido.');
+    const paidFor = s.next_due;
+    insert('subscription_payments', {
+      subscription_id: s.id, due_date: paidFor, paid_at: `${paidDate}T12:00:00.000Z`, amount: Math.round(amount * 100) / 100, method, notes, created_by: user.id,
+    });
+    s.next_due = addCycle(s.next_due, s.cycle);
+    s.updated_at = nowIso();
+    audit(user, 'billing.pay', 'subscription', s.id, `Pagamento de "${s.name}" (vencimento ${paidFor}) registrado; próximo vencimento ${s.next_due}`, { amount, method });
+    return { ok: true, next_due: s.next_due };
+  });
+
   // ---- notificações, auditoria e busca ----
   on('GET', '/notifications', ({ user }) => {
     const mine = DB.notifications.filter((n) => n.user_id === user.id);
@@ -2818,7 +3029,7 @@ async function flushSync() {
     del: (path) => request('DELETE', path),
   };
 
-  // Verificações automáticas enquanto o SystemHub estiver aberto (a cada 5 min)
+  // Verificações automáticas enquanto o NEXORA estiver aberto (a cada 5 min)
   window.startMonitor = () => {
     if (window.__monitorStarted) return;
     window.__monitorStarted = true;
@@ -2888,7 +3099,7 @@ function waLink(phone, text) {
 /** Resumo do chamado concluído, no formato de mensagem do WhatsApp. */
 function ticketSummary(t) {
   const lines = [
-    `*SystemHub — Chamado #${t.id} concluído* ✅`,
+    `*NEXORA — Chamado #${t.id} concluído* ✅`,
     '',
     `*Assunto:* ${t.title}`,
     `*Tipo:* ${TICKET_TYPE[t.type]?.label ?? t.type}`,
@@ -2939,7 +3150,7 @@ function render(root, { onLogin }) {
     <div class="login">
       <div class="login-art">
         <div class="glow1"></div><div class="glow2"></div>
-        <div class="row" style="position:relative"><span class="brand-mark">${ic('shield-check')}</span><span class="brand-name" style="font-size:20px">SystemHub</span></div>
+        <div class="row" style="position:relative"><span class="brand-mark code-mark" aria-hidden="true">&lt;/&gt;</span><span><span class="brand-name" style="font-size:20px;display:block">NEXORA</span><span class="brand-sub" style="letter-spacing:.12em">TECHNOLOGY &amp; DIGITAL SOLUTIONS</span></span></div>
         <div style="position:relative;max-width:440px">
           <h1>Todos os seus sistemas em <span>um só lugar</span>.</h1>
           <p class="mt-4" style="color:var(--navy-200)">Catálogo, responsáveis, documentação, disponibilidade e chamados centralizados para a sua equipe.</p>
@@ -2949,7 +3160,7 @@ function render(root, { onLogin }) {
             <li><span>${ic('kanban', 'sm')}</span>Gestão de chamados em Kanban</li>
           </ul>
         </div>
-        <p class="xs" style="position:relative;color:var(--navy-300)">© ${new Date().getFullYear()} SystemHub</p>
+        <p class="xs" style="position:relative;color:var(--navy-300)">© ${new Date().getFullYear()} NEXORA</p>
       </div>
       <div class="login-form-wrap">
         <button class="icon-btn" style="position:absolute;top:16px;right:16px" data-theme aria-label="Alternar tema">${ic('moon')}</button>
@@ -3046,11 +3257,13 @@ async function render(root) {
       ${header()}
       <div class="stack" style="gap:24px">
         ${hasDemo ? demoNotice() : ''}
-        ${t.public_open || d.backups?.late || d.backups?.failed ? html`<div class="row wrap" style="gap:12px">
+        ${t.public_open || d.backups?.late || d.backups?.failed || d.billing?.overdue || d.billing?.due_soon ? html`<div class="row wrap" style="gap:12px">
           ${t.public_open ? html`<a class="notice" style="border-color:var(--info-ring);background:var(--info-bg);color:var(--info);text-decoration:none" href="/tickets">${ic('link', 'sm')}
             <span><strong>${t.public_open}</strong> chamado(s) aberto(s) pelo link público aguardando atendimento</span></a>` : ''}
           ${d.backups?.failed || d.backups?.late ? html`<a class="notice" style="border-color:var(--bad-ring);background:var(--bad-bg);color:var(--bad);text-decoration:none" href="/backups">${ic('hard-drive', 'sm')}
             <span>Backups: <strong>${d.backups.failed}</strong> com falha · <strong>${d.backups.late}</strong> atrasado(s)</span></a>` : ''}
+          ${d.billing?.overdue || d.billing?.due_soon ? html`<a class="notice" style="text-decoration:none" href="/dominios">${ic('globe', 'sm')}
+            <span>Domínios e mensalidades: <strong>${d.billing.overdue}</strong> vencida(s) · <strong>${d.billing.due_soon}</strong> vencendo em 7 dias</span></a>` : ''}
         </div>` : ''}
         <div class="grid cols-6">
           ${stat('Sistemas cadastrados', s.total, 'layout-grid', 'navy', '/systems', `${s.critical} de criticidade crítica`)}
@@ -5129,7 +5342,7 @@ window.Pages['backups'] = render;
 })();
 
 // ===================== page-settings =====================
-﻿// Página: configurações (conexão Supabase, instalação, WhatsApp e link público de chamados)
+// Página: configurações (conexão Supabase, instalação, WhatsApp e link público de chamados)
 (function () {
 /** Link público para abrir chamado. Inclui a conexão quando ela não está fixada no script.js. */
 function publicTicketLink(cfg, publicUrl) {
@@ -5165,7 +5378,7 @@ async function render(root, { setup = false } = {}) {
       <div class="stack" style="gap:24px">
 
         <div class="card">
-          <div class="card-header"><div><h3>${ic('plug', 'sm')} Banco de dados</h3><p class="sub">Onde os dados do SystemHub ficam salvos</p></div>
+          <div class="card-header"><div><h3>${ic('plug', 'sm')} Banco de dados</h3><p class="sub">Onde os dados do NEXORA ficam salvos</p></div>
             ${remote ? badge('Conectado ao Supabase', 'ok') : badge('Modo local (este navegador)', 'demo')}</div>
           <div class="card-body stack">
             <p class="small">${remote
@@ -5214,8 +5427,8 @@ async function render(root, { setup = false } = {}) {
           <div class="card-header"><div><h3>${ic('whatsapp', 'sm')} Atendimento e link público</h3><p class="sub">Quem tiver o link abre chamados sem precisar de login</p></div></div>
           <form class="card-body stack" id="setform" novalidate>
             <div class="grid cols-2">
-              ${field('Seu WhatsApp (para receber os resumos)', html`<input class="input" name="owner_whatsapp" value="${settings.owner_whatsapp ?? ''}" placeholder="(11) 99999-9999" inputmode="tel" />`, { hint: 'Usado no botão “Enviar para mim” ao concluir chamados.' })}
-              ${field('Endereço onde o SystemHub está publicado (opcional)', html`<input class="input" name="public_url" value="${settings.public_url ?? ''}" placeholder="https://suaempresa.github.io/systemhub/" />`, { hint: 'Necessário para pessoas de fora acessarem o link.' })}
+              ${field('Seu WhatsApp (para receber os resumos)', html`<input class="input" name="owner_whatsapp" value="${settings.owner_whatsapp ?? ''}" placeholder="(11) 99999-9999" inputmode="tel" />`, { hint: 'Recebe os resumos ao concluir chamados e aparece para o cliente no botão “Enviar no WhatsApp” após abrir um chamado.' })}
+              ${field('Endereço onde o NEXORA está publicado (opcional)', html`<input class="input" name="public_url" value="${settings.public_url ?? ''}" placeholder="https://suaempresa.github.io/systemhub/" />`, { hint: 'Necessário para pessoas de fora acessarem o link.' })}
             </div>
             <div><button class="btn primary" type="submit">${ic('save', 'sm')} Salvar</button></div>
             <div>
@@ -5224,7 +5437,7 @@ async function render(root, { setup = false } = {}) {
                 <button class="btn" type="button" data-copy-link>${ic('copy', 'sm')} Copiar</button>
                 <a class="btn" href="${link}" target="_blank" rel="noopener noreferrer">${ic('external-link', 'sm')} Abrir</a></div>
               <p class="xs muted mt-2">${!settings.public_url
-                ? html`⚠️ Este link aponta para o arquivo no seu computador e só funciona aqui. Para clientes abrirem de qualquer lugar, publique a pasta do SystemHub (ex.: GitHub Pages, Netlify ou Vercel — gratuitos), informe o endereço acima${remote ? '' : ' e conecte ao Supabase'}.`
+                ? html`⚠️ Este link aponta para o arquivo no seu computador e só funciona aqui. Para clientes abrirem de qualquer lugar, publique a pasta do NEXORA (ex.: GitHub Pages, Netlify ou Vercel — gratuitos), informe o endereço acima${remote ? '' : ' e conecte ao Supabase'}.`
                 : remote ? 'Pronto para compartilhar: envie por WhatsApp, e-mail ou coloque no seu site.' : '⚠️ No modo local os chamados ficam só neste navegador. Conecte ao Supabase para receber chamados de outras pessoas.'}</p>
             </div>
           </form>
@@ -5271,7 +5484,7 @@ async function render(root, { setup = false } = {}) {
       });
     });
     root.querySelector('[data-local]')?.addEventListener('click', async () => {
-      if (!(await confirmDialog({ title: 'Voltar ao modo local', confirmLabel: 'Desconectar', message: 'O SystemHub vai usar os dados salvos neste navegador. Os dados no Supabase continuam lá e voltam ao reconectar.' }))) return;
+      if (!(await confirmDialog({ title: 'Voltar ao modo local', confirmLabel: 'Desconectar', message: 'O NEXORA vai usar os dados salvos neste navegador. Os dados no Supabase continuam lá e voltam ao reconectar.' }))) return;
       await api.put('/config', { supabaseUrl: '', supabaseKey: '' });
       location.hash = '#/';
       location.reload();
@@ -5334,12 +5547,12 @@ window.Pages['settings'] = render;
 // Página: formulário público para abrir chamado (não exige login)
 (function () {
 async function render(root) {
-  const draw = (systems) => {
+  const draw = (systems, contact) => {
     root.innerHTML = String(html`
       <div class="public-wrap">
         <div class="public-card card">
           <div class="public-head">
-            <span class="brand-mark">${ic('shield-check')}</span>
+            <span class="brand-mark code-mark" aria-hidden="true">&lt;/&gt;</span>
             <div><h1>Abrir um chamado</h1><p class="muted">Tem uma dúvida, encontrou um problema ou quer sugerir uma melhoria? Conte para a gente.</p></div>
           </div>
           <form class="grid cols-2" novalidate id="pform">
@@ -5360,7 +5573,7 @@ async function render(root) {
             </div>
           </form>
         </div>
-        <p class="xs muted center mt-4">SystemHub · Central de atendimento</p>
+        <p class="xs muted center mt-4">NEXORA · Technology &amp; Digital Solutions</p>
       </div>`);
 
     const form = root.querySelector('#pform');
@@ -5379,7 +5592,7 @@ async function render(root) {
       await busy(form.querySelector('[type=submit]'), async () => {
         try {
           const r = await api.post('/public/tickets', body);
-          success(r.id, body);
+          success(r.id, body, systems, contact);
         } catch (ex) {
           err.textContent = ex.message;
           err.hidden = false;
@@ -5388,7 +5601,25 @@ async function render(root) {
     });
   };
 
-  const success = (id, body) => {
+  const TYPE_LABEL = { question: 'Dúvida', bug: 'Algo não está funcionando', improvement: 'Sugestão de melhoria', feature: 'Nova funcionalidade', incident: 'Sistema fora do ar' };
+
+  /** Mensagem pronta para o cliente enviar pelo WhatsApp de atendimento. */
+  const whatsappText = (id, b, systemName) => [
+    `Olá! Acabei de abrir o chamado *#${id}* na central de atendimento.`,
+    '',
+    `*Assunto:* ${b.title}`,
+    `*Tipo:* ${TYPE_LABEL[b.type] ?? b.type}`,
+    systemName ? `*Sistema:* ${systemName}` : null,
+    `*Nome:* ${b.requester_name}${b.requester_company ? ` (${b.requester_company})` : ''}`,
+    `*WhatsApp:* ${b.requester_phone}`,
+    b.requester_email ? `*E-mail:* ${b.requester_email}` : null,
+    '',
+    '*Descrição:*',
+    b.description,
+  ].filter((l) => l !== null).join('\n');
+
+  const success = (id, body, systems, contact) => {
+    const systemName = systems.find((s) => String(s.id) === String(body.system_id))?.name ?? null;
     root.innerHTML = String(html`
       <div class="public-wrap">
         <div class="public-card card center" style="padding:48px 32px">
@@ -5396,6 +5627,12 @@ async function render(root) {
           <h1 style="font-size:22px">Chamado enviado!</h1>
           <p class="muted mt-2">Seu protocolo é <strong style="color:var(--text)">#${id}</strong>.</p>
           <p class="muted mt-1">Obrigado, ${body.requester_name.split(' ')[0]}. Quando o atendimento for concluído, você receberá o resumo no WhatsApp ${body.requester_phone}.</p>
+          ${contact ? html`
+            <div class="mt-6" style="padding:16px;border-radius:10px;border:1px solid var(--ok-ring);background:var(--ok-bg)">
+              <p class="strong" style="color:var(--text)">Quer agilizar o atendimento?</p>
+              <p class="small muted mt-1">Envie os detalhes do chamado direto para o nosso WhatsApp. A mensagem já vai pronta.</p>
+              <a class="btn primary mt-3" style="background:#16a34a" href="${waLink(contact, whatsappText(id, body, systemName))}" target="_blank" rel="noopener noreferrer">${ic('whatsapp', 'sm')} Enviar no WhatsApp</a>
+            </div>` : ''}
           <button class="btn mt-6" data-again>${ic('plus', 'sm')} Abrir outro chamado</button>
         </div>
       </div>`);
@@ -5412,11 +5649,250 @@ async function render(root) {
       return;
     }
   }
-  draw(systems ?? []);
+  const contact = (await api.get('/public/contact').catch(() => ({ whatsapp: '' }))).whatsapp;
+  draw(systems ?? [], contact);
 }
 
 window.Pages = window.Pages || {};
 window.Pages['public-ticket'] = render;
+})();
+
+// ===================== page-billing =====================
+// Página: domínios e mensalidades dos sistemas
+(function () {
+const KIND = {
+  domain: { label: 'Domínio', icon: 'globe' },
+  hosting: { label: 'Hospedagem', icon: 'server' },
+  ssl: { label: 'Certificado SSL', icon: 'lock' },
+  license: { label: 'Licença', icon: 'key-round' },
+  fee: { label: 'Mensalidade', icon: 'wallet' },
+  other: { label: 'Outro', icon: 'box' },
+};
+const CYCLE = { monthly: 'Mensal', quarterly: 'Trimestral', semiannual: 'Semestral', yearly: 'Anual' };
+const CYCLE_SHORT = { monthly: '/mês', quarterly: '/trimestre', semiannual: '/semestre', yearly: '/ano' };
+const SUB_STATUS = {
+  overdue: { label: 'Vencida', tone: 'bad' },
+  due_soon: { label: 'Vence em breve', tone: 'warn' },
+  ok: { label: 'Em dia', tone: 'ok' },
+  inactive: { label: 'Cancelada', tone: 'neutral' },
+};
+const METHODS = ['Cartão de crédito', 'Boleto', 'Pix', 'Débito automático', 'Transferência'];
+const brl = (v) => Number(v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const moneyInput = (v) => (v == null || v === '' ? '' : Number(v).toFixed(2).replace('.', ','));
+const dueText = (d) => (d < 0 ? `vencida há ${-d} dia(s)` : d === 0 ? 'vence hoje' : `em ${d} dia(s)`);
+const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+
+async function render(root) {
+  const manage = can('billing:manage');
+  const f = { q: '', kind: '', status: '', system: '', client: '' };
+  let data = null;
+  const [systems, clients] = await Promise.all([
+    cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []),
+    can('clients:view') ? cached('clients-options', () => api.get('/clients').then((l) => l.map((c) => ({ id: c.id, name: c.name })))).catch(() => []) : [],
+  ]);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Domínios e mensalidades</h1><p class="sub">Domínios, hospedagens, certificados, licenças e mensalidades de cada sistema</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('plus', 'sm')} Nova cobrança</button>` : ''}
+    </div>
+    <div id="bsum" class="mb-6">${skeleton(110, 1)}</div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:220px">${ic('search', 'sm')}<input class="input" id="sq" placeholder="Buscar por domínio, fornecedor, sistema ou cliente" aria-label="Buscar" /></div>
+      <select class="input" style="width:170px" data-f="kind" aria-label="Tipo">${options(Object.entries(KIND).map(([k, v]) => [k, v.label]), '', { empty: 'Todos os tipos' })}</select>
+      <select class="input" style="width:170px" data-f="status" aria-label="Situação">${options(Object.entries(SUB_STATUS).map(([k, v]) => [k, v.label]), '', { empty: 'Todas as situações' })}</select>
+      <select class="input" style="width:200px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), '', { empty: 'Todos os sistemas' })}</select>
+      ${clients.length ? html`<select class="input" style="width:200px" data-f="client" aria-label="Cliente">${options(clients.map((c) => [c.id, c.name]), '', { empty: 'Todos os clientes' })}</select>` : ''}
+    </div></div>
+    <div id="slist">${skeleton(56, 4)}</div>`);
+
+  const load = async () => {
+    try {
+      data = await api.get('/subscriptions', f);
+      drawSummary();
+      drawList();
+    } catch (err) {
+      root.querySelector('#slist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const drawSummary = () => {
+    const s = data.summary;
+    const tile = (label, value, iconName, tone, hint, quick) => html`
+      <button class="card stat clickable" style="text-align:left;border:1px solid var(--border)" data-quick="${quick ?? ''}">
+        <span class="s-head">${label}<span class="s-icon ic-${tone}">${ic(iconName)}</span></span>
+        <span class="s-value" style="font-size:24px">${value}</span><span class="s-hint">${hint}</span></button>`;
+    root.querySelector('#bsum').innerHTML = String(html`
+      ${s.overdue || s.due_soon ? html`<div class="alert-box mb-4"><p class="strong row" style="color:inherit">${ic('alert-octagon', 'sm')} Atenção aos vencimentos</p>
+        <p class="small mt-1">${s.overdue ? `${s.overdue} cobrança(s) vencida(s), total de ${brl(s.overdue_amount)}. ` : ''}${s.due_soon ? `${s.due_soon} vence(m) nos próximos 7 dias.` : ''}</p></div>` : ''}
+      <div class="grid cols-4">
+        ${tile('Custo mensal', brl(s.monthly_total), 'wallet', 'navy', `${s.active} cobrança(s) ativa(s) · ${s.domains} domínio(s)`, '')}
+        ${tile('Custo anual', brl(s.yearly_total), 'calculator', 'info', 'Projeção dos próximos 12 meses', '')}
+        ${tile('Próximos 30 dias', brl(s.next30_amount), 'calendar-clock', 'demo', `${s.next30} vencimento(s)`, 'due_soon')}
+        ${tile('Vencidas', brl(s.overdue_amount), 'alert-octagon', 'bad', `${s.overdue} cobrança(s) em atraso`, 'overdue')}
+      </div>`);
+  };
+
+  const drawList = () => {
+    const items = data.items;
+    root.querySelector('#slist').innerHTML = String(items.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Item</th><th>Sistema / cliente</th><th>Valor</th><th>Equiv. mensal</th><th>Vencimento</th><th>Renovação</th><th>Situação</th><th></th></tr></thead>
+      <tbody>${items.map((s) => html`<tr class="clickable" data-open="${s.id}">
+        <td style="min-width:240px"><div class="row"><span class="sys-icon sm" style="background:var(--navy-700)">${ic(KIND[s.kind]?.icon ?? 'box')}</span>
+          <div><p class="strong">${s.name}</p><p class="xs muted">${KIND[s.kind]?.label ?? s.kind}${s.provider ? ` · ${s.provider}` : ''}${s.is_demo ? ' · fictício' : ''}</p></div></div></td>
+        <td><p class="nowrap">${s.system_name ?? '—'}</p>${s.client_name ? html`<p class="xs muted nowrap">${s.client_name}</p>` : ''}</td>
+        <td class="nowrap"><strong>${brl(s.amount)}</strong><span class="xs muted">${CYCLE_SHORT[s.cycle]}</span></td>
+        <td class="nowrap muted">${brl(s.monthly_amount)}</td>
+        <td class="nowrap"><p>${formatDate(s.next_due)}</p><p class="xs ${s.days_left < 0 ? 'text-bad strong' : s.days_left <= 7 ? 'strong' : 'muted'}">${s.active ? dueText(s.days_left) : '—'}</p></td>
+        <td class="xs">${s.auto_renew ? html`<span class="row text-ok" style="gap:4px">${ic('refresh-cw', 'sm')}Automática</span>` : html`<span class="muted">Manual</span>`}</td>
+        <td>${badge(SUB_STATUS[s.status].label, SUB_STATUS[s.status].tone)}</td>
+        <td class="right nowrap">${manage && s.active ? html`<button class="btn sm" data-pay="${s.id}">${ic('check', 'sm')} Pagar</button>` : ''}</td>
+      </tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhuma cobrança encontrada', manage ? 'Cadastre domínios, hospedagens e mensalidades para acompanhar os vencimentos.' : '', 'globe')}</div>`);
+  };
+
+  const subModal = (s = { kind: 'domain', cycle: 'yearly', auto_renew: false, active: true, next_due: '' }) => {
+    const st = { auto_renew: !!s.auto_renew, active: s.active !== false };
+    openModal({
+      title: s.id ? 'Editar cobrança' : 'Nova cobrança',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate>
+        ${field('Tipo *', html`<select class="input" name="kind">${options(Object.entries(KIND).map(([k, v]) => [k, v.label]), s.kind)}</select>`)}
+        ${field('Domínio / descrição *', html`<input class="input" name="name" value="${s.name ?? ''}" placeholder="Ex.: minhaempresa.com.br" maxlength="160" autofocus />`)}
+        ${field('Sistema', html`<select class="input" name="system_id">${options(systems.map((x) => [x.id, x.name]), s.system_id, { empty: '— Nenhum —' })}</select>`)}
+        ${field('Cliente (quem paga)', html`<select class="input" name="client_id">${options(clients.map((x) => [x.id, x.name]), s.client_id, { empty: '— Nenhum / interno —' })}</select>`)}
+        ${field('Fornecedor', html`<input class="input" name="provider" value="${s.provider ?? ''}" placeholder="Ex.: Registro.br, Hostinger, GoDaddy" maxlength="120" list="providers" />
+          <datalist id="providers">${['Registro.br', 'GoDaddy', 'Hostinger', 'HostGator', 'Locaweb', 'KingHost', 'Cloudflare', 'AWS', 'Google Cloud', 'Vercel', 'Netlify'].map((p) => html`<option value="${p}"></option>`)}</datalist>`)}
+        ${field('Valor (R$) *', html`<input class="input" name="amount" value="${moneyInput(s.amount)}" inputmode="decimal" placeholder="0,00" />`)}
+        ${field('Periodicidade *', html`<select class="input" name="cycle">${options(Object.entries(CYCLE), s.cycle)}</select>`)}
+        ${field('Próximo vencimento *', html`<input class="input" type="date" name="next_due" value="${s.next_due ?? ''}" />`)}
+        ${field('Forma de pagamento', html`<input class="input" name="payment_method" value="${s.payment_method ?? ''}" list="methods" maxlength="60" />
+          <datalist id="methods">${METHODS.map((m) => html`<option value="${m}"></option>`)}</datalist>`)}
+        <div style="align-self:end">${toggle('auto_renew', st.auto_renew, 'Renovação automática', 'Cobrança recorrente no cartão/débito.')}</div>
+        <div class="span-all">${toggle('active', st.active, 'Cobrança ativa', 'Desative quando o serviço for cancelado.')}</div>
+        ${field('Observações', html`<textarea class="input" name="notes" placeholder="Login do painel do fornecedor NÃO deve ser colocado aqui.">${s.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        bindToggles(el, st);
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = { ...Object.fromEntries(new FormData(el.querySelector('form'))), auto_renew: st.auto_renew, active: st.active };
+          try {
+            if (s.id) await api.put(`/subscriptions/${s.id}`, body);
+            else await api.post('/subscriptions', body);
+            toast('Cobrança salva');
+            close();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const payModal = (s) => openModal({
+    title: 'Registrar pagamento',
+    description: `${s.name} · vencimento ${formatDate(s.next_due)}`,
+    body: html`<div class="stack">
+      <div class="grid cols-2">
+        ${field('Data do pagamento', html`<input class="input" type="date" name="paid_at" value="${today()}" max="${today()}" />`)}
+        ${field('Valor pago (R$)', html`<input class="input" name="amount" value="${moneyInput(s.amount)}" inputmode="decimal" />`)}
+      </div>
+      ${field('Forma de pagamento', html`<input class="input" name="method" value="${s.payment_method ?? ''}" list="methods2" /><datalist id="methods2">${METHODS.map((m) => html`<option value="${m}"></option>`)}</datalist>`)}
+      ${field('Observação', html`<input class="input" name="notes" placeholder="Ex.: número do comprovante" maxlength="500" />`)}
+      <p class="xs muted">Ao registrar, o próximo vencimento avança automaticamente (${CYCLE[s.cycle].toLowerCase()}).</p>
+    </div>`,
+    footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>${ic('check', 'sm')} Confirmar pagamento</button>`,
+    onMount: (el, close) => el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      const v = (n) => el.querySelector(`[name=${n}]`).value;
+      try {
+        const r = await api.post(`/subscriptions/${s.id}/pay`, { paid_at: v('paid_at'), amount: v('amount'), method: v('method'), notes: v('notes') });
+        toast(`Pagamento registrado. Próximo vencimento: ${formatDate(r.next_due)}`);
+        close();
+        await load();
+      } catch (err) { toast(err.message, 'error'); }
+    })),
+  });
+
+  const chargeText = (s) => [
+    `Olá! Tudo bem? 😊`,
+    '',
+    `Lembrete de cobrança — *${KIND[s.kind]?.label ?? 'Serviço'}: ${s.name}*`,
+    s.system_name ? `*Sistema:* ${s.system_name}` : null,
+    `*Valor:* ${brl(s.amount)} (${CYCLE[s.cycle].toLowerCase()})`,
+    `*Vencimento:* ${formatDate(s.next_due)}${s.days_left < 0 ? ' (em atraso)' : ''}`,
+    '',
+    'Qualquer dúvida, estou à disposição.',
+  ].filter((l) => l !== null).join('\n');
+
+  const openSub = async (id) => {
+    const d = openDrawer({
+      head: html`<p class="strong">Cobrança</p><button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button>`,
+      body: html`<div class="center"><span class="spinner"></span></div>`,
+    });
+    let s;
+    try {
+      s = await api.get(`/subscriptions/${id}`);
+    } catch (err) {
+      return d.set('body', errorState(err));
+    }
+    const total = s.payments.reduce((a, p) => a + p.amount, 0);
+    d.set('head', html`<p class="strong">Cobrança</p><div class="row">
+      ${manage && s.active ? html`<button class="btn primary sm" data-pay-d>${ic('check', 'sm')} Pagar</button>` : ''}
+      ${manage ? html`<button class="btn sm" data-edit-d>${ic('pencil', 'sm')} Editar</button>
+        <button class="btn ghost sm icon" data-del-d aria-label="Excluir cobrança" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}
+      <button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button></div>`);
+    d.set('body', html`
+      <div class="row"><span class="sys-icon" style="background:var(--navy-700)">${ic(KIND[s.kind]?.icon ?? 'box')}</span>
+        <div><h2 style="font-size:20px">${s.name}</h2><p class="xs muted">${KIND[s.kind]?.label}${s.provider ? ` · ${s.provider}` : ''}</p></div></div>
+      <div class="row wrap mt-3">${badge(SUB_STATUS[s.status].label, SUB_STATUS[s.status].tone)}${s.is_demo ? badge('Fictício', 'demo') : ''}</div>
+      <dl class="facts">
+        <div><dt>Valor</dt><dd>${brl(s.amount)} <span class="xs muted">${CYCLE_SHORT[s.cycle]}</span></dd></div>
+        <div><dt>Equivalente mensal</dt><dd>${brl(s.monthly_amount)}</dd></div>
+        <div><dt>Próximo vencimento</dt><dd class="${s.days_left < 0 ? 'text-bad' : ''}">${formatDate(s.next_due)} <span class="xs muted">· ${dueText(s.days_left)}</span></dd></div>
+        <div><dt>Renovação</dt><dd>${s.auto_renew ? 'Automática' : 'Manual'}</dd></div>
+        <div><dt>Sistema</dt><dd>${s.system_id ? html`<a href="/systems/${s.system_id}">${s.system_name}</a>` : '—'}</dd></div>
+        <div><dt>Cliente</dt><dd>${s.client_id ? html`<a href="/clients?open=${s.client_id}">${s.client_name}</a>` : '—'}</dd></div>
+        <div><dt>Forma de pagamento</dt><dd>${s.payment_method ?? '—'}</dd></div>
+        <div><dt>Total já pago</dt><dd>${brl(total)}</dd></div>
+      </dl>
+      ${s.client_phone ? html`<a class="btn mt-4" style="color:#16a34a" href="${waLink(s.client_phone, chargeText(s))}" target="_blank" rel="noopener noreferrer">${ic('whatsapp', 'sm')} Enviar lembrete de cobrança ao cliente</a>` : ''}
+      ${s.notes ? html`<p class="pre small mt-4">${s.notes}</p>` : ''}
+      <h3 class="mt-6 mb-4" style="font-size:14px">Pagamentos (${s.payments.length})</h3>
+      ${s.payments.length ? html`<div class="table-wrap"><table class="table"><thead><tr><th>Vencimento</th><th>Pago em</th><th>Valor</th><th>Forma</th></tr></thead><tbody>
+        ${s.payments.map((p) => html`<tr><td class="nowrap">${formatDate(p.due_date)}</td><td class="nowrap">${formatDate(p.paid_at)}</td>
+          <td class="nowrap">${brl(p.amount)}</td><td class="xs">${p.method ?? '—'}${p.notes ? html`<p class="muted">${p.notes}</p>` : ''}</td></tr>`)}
+      </tbody></table></div>` : emptyState('Nenhum pagamento registrado')}`);
+    d.el.querySelector('[data-pay-d]')?.addEventListener('click', () => { d.close(); payModal(s); });
+    d.el.querySelector('[data-edit-d]')?.addEventListener('click', () => { d.close(); subModal(s); });
+    d.el.querySelector('[data-del-d]')?.addEventListener('click', async () => {
+      if (!(await confirmDialog({ title: 'Excluir cobrança', danger: true, confirmLabel: 'Excluir', message: html`Excluir <strong>${s.name}</strong> e o histórico de pagamentos? Para encerrar um serviço, prefira desativar a cobrança.` }))) return;
+      try { await api.del(`/subscriptions/${s.id}`); toast('Cobrança excluída'); d.close(); await load(); } catch (err) { toast(err.message, 'error'); }
+    });
+  };
+
+  const sq = root.querySelector('#sq');
+  sq.addEventListener('input', debounce(() => { f.q = sq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return subModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const q = t.closest('[data-quick]');
+    if (q) { f.status = q.dataset.quick; root.querySelector('[data-f=status]').value = f.status; return load(); }
+    const pay = t.closest('[data-pay]');
+    if (pay) return payModal(data.items.find((s) => s.id === Number(pay.dataset.pay)));
+    const row = t.closest('[data-open]');
+    if (row && !t.closest('a, button')) openSub(Number(row.dataset.open));
+  });
+
+  await load();
+}
+
+window.Pages = window.Pages || {};
+window.Pages['billing'] = render;
 })();
 
 // ===================== app =====================
@@ -5435,6 +5911,7 @@ const ROUTES = [
   { re: /^\/people$/, page: 'people' },
   { re: /^\/clients$/, page: 'clients', perm: 'clients:view' },
   { re: /^\/backups$/, page: 'backups', perm: 'backups:view' },
+  { re: /^\/dominios$/, page: 'billing', perm: 'billing:view' },
   { re: /^\/users$/, page: 'users', perm: 'users:manage' },
   { re: /^\/audit$/, page: 'audit', perm: 'audit:view' },
   { re: /^\/configuracao$/, page: 'settings', perm: 'settings:manage' },
@@ -5445,6 +5922,7 @@ const NAV = [
   { to: '/systems', label: 'Catálogo de sistemas', icon: 'layout-grid' },
   { to: '/monitoring', label: 'Monitoramento', icon: 'activity', perm: 'monitoring:view' },
   { to: '/backups', label: 'Backups', icon: 'hard-drive', perm: 'backups:view' },
+  { to: '/dominios', label: 'Domínios e mensalidades', icon: 'globe', perm: 'billing:view' },
   { to: '/tickets', label: 'Chamados', icon: 'kanban' },
   { to: '/clients', label: 'Clientes', icon: 'briefcase', perm: 'clients:view' },
   { to: '/people', label: 'Responsáveis', icon: 'contact' },
@@ -5567,8 +6045,8 @@ function renderShell() {
       <div class="mobile-backdrop" data-action="close-menu"></div>
       <aside class="sidebar">
         <div class="brand">
-          <span class="brand-mark">${ic('shield-check')}</span>
-          <div class="brand-text"><p class="brand-name">SystemHub</p><p class="brand-sub">Central de sistemas</p></div>
+          <span class="brand-mark code-mark" aria-hidden="true">&lt;/&gt;</span>
+          <div class="brand-text"><p class="brand-name">NEXORA</p><p class="brand-sub">Technology &amp; Digital Solutions</p></div>
         </div>
         <nav class="nav">
           ${NAV.filter((n) => !n.perm || can(n.perm)).map((n) => html`<a href="${n.to}" data-nav="${n.to}" title="${n.label}">${ic(n.icon)}<span class="nav-label">${n.label}</span></a>`)}
