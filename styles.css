@@ -572,3 +572,7 @@ html.dark .palette-item.on { background: rgba(255, 255, 255, 0.08); }
 .public-head { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
 .public-head h1 { font-size: 24px; }
 .public-head .brand-mark { flex-shrink: 0; }
+
+/* ---------- marca NEXORA ---------- */
+.code-mark { font-family: 'Cascadia Code', Consolas, 'Courier New', monospace; font-weight: 800; font-size: 14px; letter-spacing: -0.04em; }
+.brand-sub { text-transform: uppercase; letter-spacing: 0.04em; font-size: 9px; white-space: nowrap; }
