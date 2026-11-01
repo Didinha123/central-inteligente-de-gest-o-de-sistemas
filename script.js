@@ -632,8 +632,8 @@ function barChart(el, data, { onSelect } = {}) {
 // Opção 2 (para hospedar e compartilhar com a equipe): preencha aqui.
 // A chave "anon public" pode ficar no navegador — a proteção é feita pelo RLS do banco.
 // ---------------------------------------------------------------------
-const SUPABASE_URL = 'https://ziklieantgvepcipvvkl.supabase.co'; // ex.: 'https://abcdefgh.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_nHCDbCwDhvYrhVJfU5f9ew_IyXkVS-V'; // ex.: 'eyJhbGciOi...'
+const SUPABASE_URL = 'https://ziklieantgvepcipvvkl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_nHCDbCwDhvYrhVJfU5f9ew_IyXkVS-V'; // chave pública (Publishable key)
 
 const DB_KEY = 'systemhub-db-v1';
 const CONFIG_KEY = 'systemhub-config';
@@ -1221,9 +1221,11 @@ async function sbFetch(path, { method = 'GET', body, headers = {}, anon = false 
   const token = anon ? null : await sbAccessToken();
   let res;
   try {
+    // Chaves novas (sb_publishable_...) vão só no cabeçalho apikey; as antigas (anon, JWT) também no Authorization.
+    const bearer = token ?? (supabaseKey.startsWith('eyJ') ? supabaseKey : null);
     res = await fetch(`${supabaseUrl}${path}`, {
       method,
-      headers: { apikey: supabaseKey, Authorization: `Bearer ${token ?? supabaseKey}`, 'Content-Type': 'application/json', ...headers },
+      headers: { apikey: supabaseKey, ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}), 'Content-Type': 'application/json', ...headers },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
@@ -5124,7 +5126,7 @@ window.Pages['backups'] = render;
 })();
 
 // ===================== page-settings =====================
-// Página: configurações (conexão Supabase, instalação, WhatsApp e link público de chamados)
+﻿// Página: configurações (conexão Supabase, instalação, WhatsApp e link público de chamados)
 (function () {
 /** Link público para abrir chamado. Inclui a conexão quando ela não está fixada no script.js. */
 function publicTicketLink(cfg, publicUrl) {
@@ -5169,7 +5171,7 @@ async function render(root, { setup = false } = {}) {
             ${cfg.fixed ? html`<p class="notice">${ic('lock', 'sm')} A conexão está fixada no arquivo script.js (SUPABASE_URL e SUPABASE_ANON_KEY).</p>` : (!logged || admin) ? html`
               <form class="grid cols-2" id="sbform" novalidate>
                 ${field('URL do projeto (Project URL)', html`<input class="input" name="supabaseUrl" value="${cfg.supabaseUrl}" placeholder="https://abcdefgh.supabase.co" />`, { hint: 'Supabase → Project Settings → Data API' })}
-                ${field('Chave pública (anon public key)', html`<input class="input mono" name="supabaseKey" value="${cfg.anonKey}" placeholder="eyJhbGciOi…" autocomplete="off" />`, { hint: 'Supabase → Project Settings → API Keys. Nunca use a chave service_role aqui.' })}
+                ${field('Chave pública (Publishable key ou anon key)', html`<input class="input mono" name="supabaseKey" value="${cfg.anonKey}" placeholder="sb_publishable_… ou eyJhbGciOi…" autocomplete="off" />`, { hint: 'Supabase → Project Settings → API Keys. Nunca use a secret / service_role aqui.' })}
                 <div class="span-all row wrap">
                   <button class="btn" type="button" data-test>${ic('activity', 'sm')} Testar conexão</button>
                   <button class="btn primary" type="submit">${ic('save', 'sm')} Salvar e conectar</button>
@@ -5482,11 +5484,20 @@ function setQuery(params, { replace = true } = {}) {
   history[replace ? 'replaceState' : 'pushState'](null, '', hrefFor(path + (qs ? `?${qs}` : '')));
 }
 
+// Links internos viram "#/rota": funcionam em subpastas (GitHub Pages), em nova aba e abrindo o arquivo direto.
+function fixInternalLinks(root) {
+  root.querySelectorAll?.('a[href^="/"]:not([href^="//"])').forEach((a) => a.setAttribute('href', `#${a.getAttribute('href')}`));
+}
+new MutationObserver((list) => {
+  for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1) fixInternalLinks(n.matches?.('a') ? n.parentNode : n);
+}).observe(document.documentElement, { childList: true, subtree: true });
+
 document.addEventListener('click', (e) => {
   const a = e.target.closest('a[href]');
   if (!a || a.target === '_blank' || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-  const href = a.getAttribute('href');
-  if (!href.startsWith('/') || href.startsWith('//') || href.startsWith('/api/')) return;
+  let href = a.getAttribute('href');
+  if (href.startsWith('#/')) href = href.slice(1);
+  if (!href.startsWith('/') || href.startsWith('//')) return;
   e.preventDefault();
   navigate(href);
 });
