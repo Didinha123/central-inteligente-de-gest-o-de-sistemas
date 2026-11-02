@@ -576,3 +576,31 @@ html.dark .palette-item.on { background: rgba(255, 255, 255, 0.08); }
 /* ---------- marca NEXORA ---------- */
 .code-mark { font-family: 'Cascadia Code', Consolas, 'Courier New', monospace; font-weight: 800; font-size: 14px; letter-spacing: -0.04em; }
 .brand-sub { text-transform: uppercase; letter-spacing: 0.04em; font-size: 9px; white-space: nowrap; }
+
+/* ---------- Anotações (bloco de notas) ---------- */
+.note-composer { padding: 16px; }
+.note-composer textarea { min-height: 90px; resize: vertical; }
+.notes-grid { columns: 270px; column-gap: 16px; }
+.note { break-inside: avoid; margin-bottom: 16px; border-radius: 12px; padding: 12px 12px 6px; border: 1px solid var(--nb); background: var(--nbg); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); }
+.note-text { display: block; width: 100%; border: 0; background: transparent; resize: none; font: inherit; color: var(--text); line-height: 1.5; outline: none; min-height: 48px; overflow: hidden; padding: 0; }
+.note-foot { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 6px; opacity: 0.75; }
+.note:hover .note-foot, .note:focus-within .note-foot { opacity: 1; }
+.note-dots { display: inline-flex; gap: 4px; align-items: center; }
+.note .note-dots { display: none; }
+.note:hover .note-dots, .note:focus-within .note-dots { display: inline-flex; }
+.note-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(15, 23, 42, 0.25); background: var(--nbg); cursor: pointer; padding: 0; }
+.note-dot.on { outline: 2px solid var(--accent-500); outline-offset: 1px; }
+.note .btn.pinned { color: var(--accent-600); }
+.nc-yellow { --nbg: #fef9c3; --nb: #fde68a; }
+.nc-blue { --nbg: #dbeafe; --nb: #bfdbfe; }
+.nc-green { --nbg: #dcfce7; --nb: #bbf7d0; }
+.nc-pink { --nbg: #fce7f3; --nb: #fbcfe8; }
+.nc-purple { --nbg: #ede9fe; --nb: #ddd6fe; }
+.nc-gray { --nbg: #f1f5f9; --nb: #e2e8f0; }
+html.dark .nc-yellow { --nbg: rgba(234, 179, 8, 0.14); --nb: rgba(250, 204, 21, 0.25); }
+html.dark .nc-blue { --nbg: rgba(59, 130, 246, 0.14); --nb: rgba(96, 165, 250, 0.25); }
+html.dark .nc-green { --nbg: rgba(34, 197, 94, 0.13); --nb: rgba(74, 222, 128, 0.22); }
+html.dark .nc-pink { --nbg: rgba(236, 72, 153, 0.13); --nb: rgba(244, 114, 182, 0.22); }
+html.dark .nc-purple { --nbg: rgba(139, 92, 246, 0.15); --nb: rgba(167, 139, 250, 0.25); }
+html.dark .nc-gray { --nbg: rgba(148, 163, 184, 0.1); --nb: rgba(148, 163, 184, 0.2); }
+html.dark .note-dot { border-color: rgba(255, 255, 255, 0.25); }
