@@ -100,6 +100,10 @@ const P = {
   warehouse: '<path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12M6 14h12"/><rect x="6" y="10" width="12" height="12"/>',
   workflow: '<rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
   briefcase: '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="6" width="20" height="14" rx="2"/>',
+  eye: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  'eye-off': '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
+  pin: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
+  'sticky-note': '<path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/>',
 };
 
 /** Ícones disponíveis para escolher no cadastro de sistemas. */
@@ -183,7 +187,26 @@ const BACKUP_HEALTH = {
 };
 const BACKUP_TYPE = { full: 'Completo', incremental: 'Incremental', differential: 'Diferencial', snapshot: 'Snapshot' };
 const BACKUP_FREQ = { hourly: 'A cada hora', daily: 'Diário', weekly: 'Semanal', monthly: 'Mensal' };
-const CLIENT_STATUS = { active: { label: 'Ativo', tone: 'ok' }, inactive: { label: 'Inativo', tone: 'neutral' } };
+const ENVIRONMENT = {
+  production: { label: 'Produção', tone: 'ok' },
+  staging: { label: 'Homologação', tone: 'yellow' },
+  development: { label: 'Desenvolvimento', tone: 'info' },
+  test: { label: 'Teste', tone: 'neutral' },
+};
+const MAINT_KIND = { preventive: 'Preventiva', corrective: 'Corretiva', evolutive: 'Evolutiva', update: 'Atualização', security: 'Segurança', other: 'Outra' };
+const MAINT_STATUS = {
+  scheduled: { label: 'Agendada', tone: 'info' },
+  in_progress: { label: 'Em andamento', tone: 'yellow' },
+  done: { label: 'Concluída', tone: 'ok' },
+  canceled: { label: 'Cancelada', tone: 'neutral' },
+};
+const DEPLOY_STATUS = {
+  success: { label: 'Sucesso', tone: 'ok', icon: 'check-circle' },
+  failed: { label: 'Falhou', tone: 'bad', icon: 'x-circle' },
+  rollback: { label: 'Rollback', tone: 'orange', icon: 'refresh-cw' },
+  in_progress: { label: 'Em andamento', tone: 'info', icon: 'clock' },
+};
+const CLIENT_STATUS ={ active: { label: 'Ativo', tone: 'ok' }, inactive: { label: 'Inativo', tone: 'neutral' } };
 const UF = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 
 const DEFAULT_CATEGORIES = [
@@ -646,6 +669,7 @@ const TABLES = [
   'users', 'teams', 'people', 'systems', 'system_contacts', 'system_access', 'system_versions', 'health_checks',
   'incidents', 'tickets', 'ticket_events', 'favorites', 'recent_access', 'notifications', 'audit_logs',
   'clients', 'backup_jobs', 'backup_runs', 'settings', 'subscriptions', 'subscription_payments',
+  'databases', 'database_secrets', 'maintenances', 'deploys', 'notes',
 ];
 
 let DB = null;
@@ -1076,7 +1100,7 @@ const SB_COLUMNS = {
   systems: ['id', 'slug', 'name', 'icon', 'color', 'description', 'category', 'url', 'technical_owner_id', 'team_id', 'status', 'status_source',
     'status_note', 'status_updated_at', 'version', 'last_update_at', 'criticality', 'technologies', 'data_sources', 'integrations',
     'documentation_url', 'documentation', 'healthcheck_url', 'monitoring_enabled', 'pending_update', 'restricted', 'data_origin',
-    'last_check_at', 'last_latency_ms', 'created_at', 'updated_at'],
+    'last_check_at', 'last_latency_ms', 'created_at', 'updated_at', 'created_on', 'notes', 'google_account'],
   system_contacts: ['id', 'system_id', 'person_id', 'role'],
   system_access: ['id', 'system_id', 'user_id'],
   system_versions: ['id', 'system_id', 'version', 'notes', 'released_at', 'created_by'],
@@ -1099,6 +1123,14 @@ const SB_COLUMNS = {
   subscriptions: ['id', 'system_id', 'client_id', 'kind', 'name', 'provider', 'amount', 'cycle', 'next_due', 'auto_renew', 'payment_method',
     'active', 'notes', 'is_demo', 'created_at', 'updated_at'],
   subscription_payments: ['id', 'subscription_id', 'due_date', 'paid_at', 'amount', 'method', 'notes', 'created_by'],
+  databases: ['id', 'system_id', 'engine', 'url', 'project_name', 'public_key', 'project_ref', 'environment', 'region', 'rls_enabled',
+    'created_on', 'google_account', 'notes', 'is_demo', 'created_at', 'updated_at'],
+  database_secrets: ['id', 'database_id', 'project_password', 'updated_at'],
+  maintenances: ['id', 'system_id', 'title', 'kind', 'status', 'scheduled_for', 'started_at', 'finished_at', 'responsible', 'google_account',
+    'affects_status', 'description', 'notes', 'created_by', 'is_demo', 'created_at', 'updated_at'],
+  deploys: ['id', 'system_id', 'version', 'environment', 'platform', 'url', 'repository', 'branch', 'status', 'deployed_at', 'responsible',
+    'google_account', 'update_version', 'notes', 'created_by', 'is_demo', 'created_at', 'updated_at'],
+  notes: ['id', 'user_id', 'content', 'color', 'pinned', 'created_at', 'updated_at'],
 };
 
 const SB_TYPES = {
@@ -1106,6 +1138,7 @@ const SB_TYPES = {
   system_ids: 'jsonb', active: 'boolean', is_demo: 'boolean', monitoring_enabled: 'boolean', pending_update: 'boolean', restricted: 'boolean',
   ok: 'boolean', position: 'double precision', size_mb: 'double precision', last_size_mb: 'double precision',
   amount: 'numeric(12,2)', auto_renew: 'boolean',
+  rls_enabled: 'boolean', affects_status: 'boolean', update_version: 'boolean', pinned: 'boolean',
 };
 const sbColType = (c) => SB_TYPES[c] ?? (/_id$|_ms$|_code$|_days$/.test(c) ? 'bigint' : 'text');
 
@@ -1132,8 +1165,24 @@ create or replace function public.sh_has_users() returns boolean
 language sql stable security definer set search_path = public as $$
   select exists (select 1 from public.users where auth_id is not null)
 $$;
+-- Id (tabela users) do usuário logado — usado no bloco de anotações pessoais
+create or replace function public.sh_uid() returns bigint
+language sql stable security definer set search_path = public as $$
+  select id from public.users where auth_id = auth.uid() and active is true limit 1
+$$;
 grant execute on function public.sh_role() to anon, authenticated;
 grant execute on function public.sh_has_users() to anon, authenticated;
+grant execute on function public.sh_uid() to authenticated;
+
+-- Ao excluir um banco de dados, apaga também a senha guardada
+create or replace function public.sh_database_cleanup() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  delete from public.database_secrets where database_id = old.id;
+  return old;
+end $$;
+drop trigger if exists sh_database_cleanup on public.databases;
+create trigger sh_database_cleanup after delete on public.databases for each row execute function public.sh_database_cleanup();
 
 -- Somente administradores mudam perfil, e-mail ou status de usuários
 create or replace function public.sh_users_guard() returns trigger
@@ -1194,7 +1243,7 @@ begin
   end loop;
 
   -- Tabelas administradas pela equipe (admin, gestor, desenvolvedor)
-  foreach t in array array['teams','people','systems','system_contacts','system_access','system_versions','health_checks','incidents','clients','backup_jobs','backup_runs','settings','subscriptions','subscription_payments'] loop
+  foreach t in array array['teams','people','systems','system_contacts','system_access','system_versions','health_checks','incidents','clients','backup_jobs','backup_runs','settings','subscriptions','subscription_payments','maintenances','deploys'] loop
     execute format('create policy sh_select on public.%I for select to authenticated using (public.sh_role() is not null)', t);
     execute format('create policy sh_insert on public.%I for insert to authenticated with check (public.sh_role() in (''admin'',''manager'',''developer''))', t);
     execute format('create policy sh_update on public.%I for update to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
@@ -1209,6 +1258,24 @@ begin
     execute format('create policy sh_delete on public.%I for delete to authenticated using (public.sh_role() in (''admin'',''manager'',''developer''))', t);
   end loop;
 end $$;
+
+-- Bancos de dados: somente administradores e desenvolvedores veem e editam
+create policy sh_select on public.databases for select to authenticated using (public.sh_role() in ('admin','developer'));
+create policy sh_insert on public.databases for insert to authenticated with check (public.sh_role() in ('admin','developer'));
+create policy sh_update on public.databases for update to authenticated using (public.sh_role() in ('admin','developer'));
+create policy sh_delete on public.databases for delete to authenticated using (public.sh_role() in ('admin','developer'));
+
+-- Senhas dos bancos: SOMENTE administradores (ficam numa tabela separada)
+create policy sh_select on public.database_secrets for select to authenticated using (public.sh_role() = 'admin');
+create policy sh_insert on public.database_secrets for insert to authenticated with check (public.sh_role() = 'admin');
+create policy sh_update on public.database_secrets for update to authenticated using (public.sh_role() = 'admin');
+create policy sh_delete on public.database_secrets for delete to authenticated using (public.sh_role() = 'admin');
+
+-- Anotações: cada pessoa vê e edita apenas as próprias
+create policy sh_select on public.notes for select to authenticated using (user_id = public.sh_uid());
+create policy sh_insert on public.notes for insert to authenticated with check (user_id = public.sh_uid());
+create policy sh_update on public.notes for update to authenticated using (user_id = public.sh_uid());
+create policy sh_delete on public.notes for delete to authenticated using (user_id = public.sh_uid());
 
 -- Auditoria: todos registram, ninguém altera ou apaga
 create policy sh_select on public.audit_logs for select to authenticated using (public.sh_role() is not null);
@@ -1346,21 +1413,43 @@ function sbTakeSnapshot() {
   for (const t of TABLES) sbSnapshot[t] = new Map(DB[t].map((r) => [r.id, JSON.stringify(r)]));
 }
 
+/** Tabelas obrigatórias desde a primeira versão; as demais são opcionais (criadas por atualizações do script). */
+const SB_CORE_TABLES = new Set(['users', 'teams', 'people', 'systems', 'tickets', 'ticket_events', 'audit_logs', 'settings']);
+let sbMissingTables = [];
+
 /** Recarrega todos os dados do Supabase. */
 async function sbReload() {
-  const results = await Promise.all(TABLES.map((t) => sbSelectAll(t)));
+  sbMissingTables = [];
+  const results = await Promise.all(TABLES.map((t) => sbSelectAll(t).catch((err) => {
+    // tabela nova ainda não instalada: o sistema continua funcionando e avisa para rodar o script
+    if (!SB_CORE_TABLES.has(t) && (err.status === 404 || /não existem/.test(err.message))) {
+      sbMissingTables.push(t);
+      return [];
+    }
+    throw err;
+  })));
+  // colunas novas ainda não criadas (ex.: systems.created_on): não são enviadas até rodar o script
+  sbMissingColumns = {};
+  TABLES.forEach((t, i) => {
+    const sample = results[i][0];
+    const missing = sample ? SB_COLUMNS[t].filter((c) => !(c in sample)) : [];
+    if (missing.length) sbMissingColumns[t] = new Set(missing);
+  });
   const d = emptyDb();
   TABLES.forEach((t, i) => (d[t] = results[i]));
   DB = migrateDb(d);
   sbTakeSnapshot();
 }
+let sbMissingColumns = {};
+const sbUpdatePending = () => sbMissingTables.length > 0 || Object.keys(sbMissingColumns).length > 0;
 
-const sbRow = (table, r) => Object.fromEntries(SB_COLUMNS[table].map((c) => [c, r[c] === undefined ? null : r[c]]));
+const sbRow = (table, r) => Object.fromEntries(SB_COLUMNS[table].filter((c) => !sbMissingColumns[table]?.has(c)).map((c) => [c, r[c] === undefined ? null : r[c]]));
 const chunk = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
 
 /** Envia ao Supabase o que mudou desde a última sincronização (inclusões, alterações e exclusões). */
 async function sbPush() {
   for (const t of TABLES) {
+    if (sbMissingTables.includes(t)) continue; // tabela ainda não instalada no Supabase
     const prev = sbSnapshot[t] ?? new Map();
     const cur = new Map(DB[t].map((r) => [r.id, JSON.stringify(r)]));
     const upserts = [];
@@ -1438,6 +1527,14 @@ async function flushSync() {
     'settings:manage': ['admin'],
     'billing:view': ['admin', 'manager'],
     'billing:manage': ['admin', 'manager'],
+    'databases:view': ['admin', 'developer'],
+    'databases:manage': ['admin', 'developer'],
+    'databases:secrets': ['admin'],
+    'maintenance:view': ['admin', 'manager', 'developer'],
+    'maintenance:manage': ['admin', 'developer'],
+    'deploys:view': ['admin', 'manager', 'developer'],
+    'deploys:manage': ['admin', 'developer'],
+    'notes:use': ALL,
   };
   const allowed = (user, perm) => !!user && PERMISSIONS[perm].includes(user.role);
   const permissionsFor = (role) => Object.keys(PERMISSIONS).filter((p) => PERMISSIONS[p].includes(role));
@@ -1564,6 +1661,7 @@ async function flushSync() {
     const owner = s.technical_owner_id ? byId('people', s.technical_owner_id) : null;
     return {
       ...s,
+      created_on: s.created_on || s.created_at?.slice(0, 10) || null,
       technical_owner_name: owner?.name ?? null,
       technical_owner_email: owner?.email ?? null,
       technical_owner_phone: owner?.phone ?? null,
@@ -1681,7 +1779,7 @@ async function flushSync() {
   const STATUSES = ['operational', 'degraded', 'maintenance', 'down', 'unknown'];
   const CRITS = ['low', 'medium', 'high', 'critical'];
   const ORIGINS = ['real', 'manual', 'demo'];
-  const UPDATABLE = ['name', 'icon', 'color', 'description', 'category', 'url', 'technical_owner_id', 'team_id', 'version', 'criticality', 'technologies', 'data_sources', 'integrations', 'documentation_url', 'documentation', 'healthcheck_url', 'monitoring_enabled', 'pending_update', 'restricted', 'data_origin'];
+  const UPDATABLE = ['name', 'icon', 'color', 'description', 'category', 'url', 'technical_owner_id', 'team_id', 'version', 'criticality', 'technologies', 'data_sources', 'integrations', 'documentation_url', 'documentation', 'healthcheck_url', 'monitoring_enabled', 'pending_update', 'restricted', 'data_origin', 'created_on', 'notes', 'google_account'];
   const ADMIN_ONLY = ['restricted', 'data_origin', 'criticality'];
   const ORDER = {
     status: { down: 0, degraded: 1, maintenance: 2, unknown: 3, operational: 4 },
@@ -1711,10 +1809,14 @@ async function flushSync() {
       pending_update: v.bool('pending_update'),
       restricted: v.bool('restricted'),
       data_origin: v.oneOf('data_origin', ORIGINS),
+      created_on: v.date('created_on'),
+      notes: v.str('notes', { max: 5000, trim: false }),
+      google_account: v.email('google_account'),
     };
     v.done();
     if (d.color && !/^#[0-9a-fA-F]{6}$/.test(d.color)) fail(400, 'Cor inválida');
     if (d.description === null) d.description = '';
+    if (d.created_on && d.created_on > todayStr()) fail(400, 'A data de criação não pode ser no futuro.');
     for (const k of ['name', 'icon', 'color', 'category', 'url', 'version']) if (d[k] === null) d[k] = undefined;
     for (const k of Object.keys(d)) if (d[k] === undefined) delete d[k];
     let contacts;
@@ -1748,7 +1850,7 @@ async function flushSync() {
     DB.backup_jobs = DB.backup_jobs.filter((j) => !jobs.has(j.id));
     DB.backup_runs = DB.backup_runs.filter((r) => !jobs.has(r.job_id));
     for (const c of DB.clients) if ((c.system_ids ?? []).includes(id)) c.system_ids = c.system_ids.filter((x) => x !== id);
-    for (const s of DB.subscriptions) if (s.system_id === id) s.system_id = null;
+    for (const t of ['subscriptions', 'databases', 'maintenances', 'deploys']) for (const r of DB[t]) if (r.system_id === id) r.system_id = null;
   }
 
   // ---------- chamados ----------
@@ -1878,7 +1980,7 @@ async function flushSync() {
   // ---- configuração e situação da conexão ----
   on('GET', '/config', () => {
     const c = getConfig();
-    return { mode: c.remote ? 'supabase' : 'local', supabaseUrl: c.supabaseUrl, hasKey: !!c.supabaseKey, fixed: c.fixed, sql: SUPABASE_SETUP_SQL };
+    return { mode: c.remote ? 'supabase' : 'local', supabaseUrl: c.supabaseUrl, hasKey: !!c.supabaseKey, fixed: c.fixed, sql: SUPABASE_SETUP_SQL, missingTables: c.remote ? sbMissingTables : [] };
   }, { pub: true });
 
   /** Salva a URL/chave do Supabase. Só o administrador (ou ninguém logado ainda) pode trocar. */
@@ -2030,8 +2132,16 @@ async function flushSync() {
       backups: allowed(user, 'backups:view')
         ? DB.backup_jobs.reduce((acc, j) => { const h = backupHealth(j); if (h === 'late' || h === 'failed') acc[h]++; return acc; }, { late: 0, failed: 0 })
         : null,
+      db_update_pending: isRemote() && allowed(user, 'settings:manage') ? sbUpdatePending() : false,
       billing: allowed(user, 'billing:view')
         ? DB.subscriptions.reduce((acc, s) => { const st = subStatus(s); if (st === 'overdue' || st === 'due_soon') acc[st]++; return acc; }, { overdue: 0, due_soon: 0 })
+        : null,
+      maintenance: allowed(user, 'maintenance:view')
+        ? {
+          in_progress: DB.maintenances.filter((m) => m.status === 'in_progress').length,
+          late: DB.maintenances.filter((m) => m.status === 'scheduled' && m.scheduled_for && m.scheduled_for < nowIso()).length,
+          next7: DB.maintenances.filter((m) => m.status === 'scheduled' && m.scheduled_for && m.scheduled_for >= nowIso() && m.scheduled_for < new Date(Date.now() + 7 * DAY).toISOString()).length,
+        }
         : null,
       categories: groupBy('category').sort((a, b) => b.value - a.value || a.name.localeCompare(b.name)),
       origin: groupBy('data_origin'),
@@ -2060,7 +2170,8 @@ async function flushSync() {
     if (ORIGINS.includes(query.origin)) list = list.filter((s) => s.data_origin === query.origin);
     const sort = query.sort || 'name';
     const dir = query.dir === 'desc' ? -1 : 1;
-    const key = (s) => (sort === 'status' ? ORDER.status[s.status] : sort === 'criticality' ? ORDER.criticality[s.criticality] : sort === 'updated' ? s.last_update_at : sort === 'category' ? norm(s.category) : norm(s.name));
+    const key = (s) => (sort === 'status' ? ORDER.status[s.status] : sort === 'criticality' ? ORDER.criticality[s.criticality] : sort === 'updated' ? s.last_update_at
+      : sort === 'created' ? s.created_on ?? '' : sort === 'category' ? norm(s.category) : norm(s.name));
     list.sort((a, b) => { const x = key(a); const y = key(b); return (x < y ? -1 : x > y ? 1 : 0) * dir || norm(a.name).localeCompare(norm(b.name)); });
     const pageSize = Math.min(500, Math.max(1, Number(query.pageSize) || 24));
     const page = Math.max(1, Number(query.page) || 1);
@@ -2114,7 +2225,8 @@ async function flushSync() {
   on('POST', '/systems', ({ user, body }) => {
     need(user, 'systems:create');
     const { d, contacts } = parseSystem(body, true);
-    const data = { icon: 'box', color: '#244487', description: '', version: '1.0.0', criticality: 'medium', technologies: [], data_sources: [], integrations: [], monitoring_enabled: false, pending_update: false, restricted: false, data_origin: 'manual', documentation_url: null, documentation: null, healthcheck_url: null, technical_owner_id: null, team_id: null, ...d };
+    const data = { icon: 'box', color: '#244487', description: '', version: '1.0.0', criticality: 'medium', technologies: [], data_sources: [], integrations: [], monitoring_enabled: false, pending_update: false, restricted: false, data_origin: 'manual', documentation_url: null, documentation: null, healthcheck_url: null, technical_owner_id: null, team_id: null, notes: null, google_account: null, ...d };
+    data.created_on ||= todayStr();
     checkMonitoring(data);
     const s = insert('systems', { slug: slugify(data.name), ...data, status: 'unknown', status_source: 'manual', status_note: null, status_updated_at: nowIso(), last_update_at: nowIso(), last_check_at: null, last_latency_ms: null, created_at: nowIso(), updated_at: nowIso() });
     insert('system_versions', { system_id: s.id, version: s.version, notes: 'Versão inicial cadastrada', released_at: nowIso(), created_by: user.id });
@@ -2917,6 +3029,389 @@ async function flushSync() {
     return { ok: true, next_due: s.next_due };
   });
 
+  // ---- utilitários comuns às abas técnicas ----
+  const ENVS = ['production', 'staging', 'development', 'test'];
+  const sysMini = (id) => {
+    const s = id ? byId('systems', id) : null;
+    return { system_name: s?.name ?? null, system_icon: s?.icon ?? null, system_color: s?.color ?? null };
+  };
+  const isoOrNull = (val, label) => {
+    if (val === undefined || val === null || val === '') return null;
+    const t = Date.parse(val);
+    if (Number.isNaN(t)) fail(400, `${label}: data inválida`);
+    return new Date(t).toISOString();
+  };
+  const within = (iso, ms) => !!iso && iso > agoIso(ms);
+
+  // ---- bancos de dados ----
+  /** Recusa chaves secretas do Supabase (service_role / sb_secret_) no campo de chave pública. */
+  function assertPublicKey(key) {
+    if (!key) return;
+    let secret = /^sb_secret_/i.test(key);
+    const parts = key.split('.');
+    if (!secret && parts.length === 3) {
+      try { secret = /service_role/.test(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))); } catch { /* não é JWT */ }
+    }
+    if (secret) fail(400, 'Essa é a chave SECRETA (service_role / sb_secret). Ela dá acesso total ao banco e não deve ser guardada aqui — use apenas a chave pública (anon / publishable).');
+  }
+  const dbView = (r, user) => ({
+    ...r, ...sysMini(r.system_id),
+    has_password: allowed(user, 'databases:secrets') ? DB.database_secrets.some((x) => x.database_id === r.id && x.project_password) : null,
+  });
+  function parseDatabase(body) {
+    const v = validator(body);
+    const d = {
+      system_id: v.id('system_id') ?? null,
+      engine: v.str('engine', { min: 2, max: 60, required: true, label: 'Banco de dados' }),
+      url: v.url('url', { label: 'Link' }) ?? null,
+      project_name: v.str('project_name', { min: 2, max: 120, required: true, label: 'Nome do projeto' }),
+      public_key: v.str('public_key', { max: 1000 }) ?? null,
+      project_ref: v.str('project_ref', { max: 120 }) ?? null,
+      environment: v.oneOf('environment', ENVS, { label: 'Ambiente' }) ?? 'production',
+      region: v.str('region', { max: 120 }) ?? null,
+      rls_enabled: v.bool('rls_enabled') ?? false,
+      created_on: v.date('created_on') ?? null,
+      google_account: v.email('google_account') ?? null,
+      notes: v.str('notes', { max: 5000, trim: false }) ?? null,
+    };
+    const password = v.str('project_password', { max: 500, trim: false });
+    v.done();
+    assertPublicKey(d.public_key);
+    if (d.system_id && !byId('systems', d.system_id)) notFound('Sistema');
+    return { d, password };
+  }
+  function setSecret(databaseId, password) {
+    let s = DB.database_secrets.find((x) => x.database_id === databaseId);
+    if (!s) {
+      s = { id: databaseId, database_id: databaseId };
+      DB.database_secrets.push(s);
+    }
+    Object.assign(s, { project_password: password, updated_at: nowIso() });
+  }
+
+  on('GET', '/databases', ({ user, query }) => {
+    need(user, 'databases:view');
+    const all = DB.databases.map((r) => dbView(r, user));
+    let list = all;
+    if (query.q) { const toks = tokens(query.q); list = list.filter((r) => matches(`${r.engine} ${r.project_name} ${r.project_ref ?? ''} ${r.region ?? ''} ${r.system_name ?? ''} ${r.google_account ?? ''} ${r.notes ?? ''}`, toks)); }
+    if (query.environment) list = list.filter((r) => r.environment === query.environment);
+    if (query.system) list = list.filter((r) => r.system_id === Number(query.system));
+    if (query.rls === 'off') list = list.filter((r) => !r.rls_enabled);
+    list.sort((a, b) => norm(a.project_name).localeCompare(norm(b.project_name)));
+    return {
+      items: list,
+      summary: {
+        total: all.length,
+        production: all.filter((r) => r.environment === 'production').length,
+        rls_off: all.filter((r) => !r.rls_enabled).length,
+        engines: [...new Set(all.map((r) => r.engine))].length,
+      },
+    };
+  });
+
+  on('GET', '/databases/:id/secret', ({ user, params }) => {
+    need(user, 'databases:secrets');
+    const r = byId('databases', intId(params.id)) ?? notFound('Banco de dados');
+    audit(user, 'database.secret_view', 'database', r.id, `Senha do banco "${r.project_name}" visualizada`);
+    saveDb();
+    return { password: DB.database_secrets.find((x) => x.database_id === r.id)?.project_password ?? null };
+  });
+
+  on('POST', '/databases', ({ user, body }) => {
+    need(user, 'databases:manage');
+    const { d, password } = parseDatabase(body);
+    if (password && !allowed(user, 'databases:secrets')) fail(403, 'Somente administradores podem guardar senhas de banco.');
+    const r = insert('databases', { ...d, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    if (password) setSecret(r.id, password);
+    audit(user, 'database.create', 'database', r.id, `Banco "${d.project_name}" (${d.engine}) cadastrado`);
+    return { id: r.id };
+  });
+
+  on('PUT', '/databases/:id', ({ user, params, body }) => {
+    need(user, 'databases:manage');
+    const r = byId('databases', intId(params.id)) ?? notFound('Banco de dados');
+    const { d, password } = parseDatabase(body);
+    if (password !== undefined && !allowed(user, 'databases:secrets')) fail(403, 'Somente administradores podem alterar senhas de banco.');
+    const changes = diff(r, d, Object.keys(d));
+    Object.assign(r, d, { updated_at: nowIso() });
+    if (password !== undefined) {
+      setSecret(r.id, password);
+      changes.project_password = { from: '•••', to: password ? '••• (alterada)' : '(removida)' };
+    }
+    if (Object.keys(changes).length) audit(user, 'database.update', 'database', r.id, `Banco "${r.project_name}" atualizado (${Object.keys(changes).join(', ')})`, changes);
+    return { ok: true };
+  });
+
+  on('DELETE', '/databases/:id', ({ user, params }) => {
+    need(user, 'databases:manage');
+    const r = byId('databases', intId(params.id)) ?? notFound('Banco de dados');
+    DB.databases = DB.databases.filter((x) => x.id !== r.id);
+    DB.database_secrets = DB.database_secrets.filter((x) => x.database_id !== r.id);
+    audit(user, 'database.delete', 'database', r.id, `Banco "${r.project_name}" excluído`);
+    return { ok: true };
+  });
+
+  // ---- manutenções ----
+  const M_KINDS = ['preventive', 'corrective', 'evolutive', 'update', 'security', 'other'];
+  const M_STATUS = ['scheduled', 'in_progress', 'done', 'canceled'];
+  const mView = (m) => ({
+    ...m, ...sysMini(m.system_id), created_by_name: nameOf('users', m.created_by),
+    late: m.status === 'scheduled' && !!m.scheduled_for && m.scheduled_for < nowIso(),
+  });
+  function parseMaintenance(body) {
+    const v = validator(body);
+    const d = {
+      system_id: v.id('system_id'),
+      title: v.str('title', { min: 3, max: 160, required: true, label: 'Título' }),
+      kind: v.oneOf('kind', M_KINDS, { label: 'Tipo' }) ?? 'preventive',
+      status: v.oneOf('status', M_STATUS, { label: 'Situação' }) ?? 'scheduled',
+      responsible: v.str('responsible', { max: 120 }) ?? null,
+      google_account: v.email('google_account') ?? null,
+      affects_status: v.bool('affects_status') ?? true,
+      description: v.str('description', { max: 5000, trim: false }) ?? null,
+      notes: v.str('notes', { max: 5000, trim: false }) ?? null,
+    };
+    v.done();
+    d.scheduled_for = isoOrNull(body.scheduled_for, 'Data agendada');
+    if (body.finished_at) d.finished_at = isoOrNull(body.finished_at, 'Data de conclusão');
+    if (!d.system_id) fail(400, 'Selecione o sistema.');
+    if (!byId('systems', d.system_id)) notFound('Sistema');
+    if (d.finished_at && d.finished_at > nowIso()) fail(400, 'A conclusão não pode ser no futuro.');
+    return d;
+  }
+  /** Ajusta datas e o status do sistema quando a manutenção muda de situação. */
+  function maintenanceEffect(user, m, prev) {
+    if (m.status === prev) return;
+    const now = nowIso();
+    if (m.status === 'scheduled') Object.assign(m, { started_at: null, finished_at: null });
+    if (m.status === 'in_progress') Object.assign(m, { started_at: m.started_at ?? now, finished_at: null });
+    if (m.status === 'done') { m.finished_at ??= now; m.started_at ??= m.finished_at; }
+    if (m.status === 'canceled') m.finished_at ??= now;
+    const s = byId('systems', m.system_id);
+    if (!s || !m.affects_status) return;
+    const notify = (title) => notifyRoles(['admin', 'manager', 'developer'], { type: 'system', title, message: m.title, link: '/manutencoes' }, user.id);
+    if (m.status === 'in_progress') {
+      Object.assign(s, { status: 'maintenance', status_source: 'manual', status_updated_at: now, status_note: `Manutenção: ${m.title}` });
+      audit(user, 'system.status', 'system', s.id, `Status de "${s.name}" alterado para Em manutenção (manutenção #${m.id})`);
+      notify(`${s.name} entrou em manutenção`);
+    } else if (prev === 'in_progress' && s.status === 'maintenance' && s.status_source === 'manual'
+      && !DB.maintenances.some((x) => x.id !== m.id && x.system_id === s.id && x.status === 'in_progress' && x.affects_status)) {
+      const label = m.status === 'done' ? 'concluída' : m.status === 'canceled' ? 'cancelada' : 'reagendada';
+      Object.assign(s, { status: 'operational', status_source: 'manual', status_updated_at: now, status_note: `Manutenção ${label}: ${m.title}` });
+      audit(user, 'system.status', 'system', s.id, `Status de "${s.name}" voltou para Operacional (manutenção #${m.id} ${label})`);
+      notify(`${s.name} saiu da manutenção (${label})`);
+    }
+  }
+
+  on('GET', '/maintenances', ({ user, query }) => {
+    need(user, 'maintenance:view');
+    const all = DB.maintenances.map(mView);
+    let list = all;
+    if (query.q) { const toks = tokens(query.q); list = list.filter((m) => matches(`${m.title} ${m.system_name ?? ''} ${m.responsible ?? ''} ${m.google_account ?? ''} ${m.description ?? ''} ${m.notes ?? ''}`, toks)); }
+    if (query.status === 'late') list = list.filter((m) => m.late);
+    else if (query.status) list = list.filter((m) => m.status === query.status);
+    if (query.kind) list = list.filter((m) => m.kind === query.kind);
+    if (query.system) list = list.filter((m) => m.system_id === Number(query.system));
+    const rank = (m) => (m.status === 'in_progress' ? 0 : m.late ? 1 : m.status === 'scheduled' ? 2 : 3);
+    list.sort((a, b) => rank(a) - rank(b) || (rank(a) < 3
+      ? (a.scheduled_for ?? '9').localeCompare(b.scheduled_for ?? '9')
+      : (b.finished_at ?? b.created_at).localeCompare(a.finished_at ?? a.created_at)));
+    return {
+      items: list,
+      summary: {
+        scheduled: all.filter((m) => m.status === 'scheduled').length,
+        in_progress: all.filter((m) => m.status === 'in_progress').length,
+        late: all.filter((m) => m.late).length,
+        done_30d: all.filter((m) => m.status === 'done' && within(m.finished_at, 30 * DAY)).length,
+      },
+    };
+  });
+
+  on('POST', '/maintenances', ({ user, body }) => {
+    need(user, 'maintenance:manage');
+    const d = parseMaintenance(body);
+    const m = insert('maintenances', { started_at: null, finished_at: null, ...d, status: 'scheduled', created_by: user.id, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    audit(user, 'maintenance.create', 'maintenance', m.id, `Manutenção "${m.title}" cadastrada para ${nameOf('systems', m.system_id)}`);
+    m.status = d.status;
+    maintenanceEffect(user, m, 'scheduled');
+    return { id: m.id };
+  });
+
+  on('PUT', '/maintenances/:id', ({ user, params, body }) => {
+    need(user, 'maintenance:manage');
+    const m = byId('maintenances', intId(params.id)) ?? notFound('Manutenção');
+    const d = parseMaintenance(body);
+    const prev = m.status;
+    const changes = diff(m, d, Object.keys(d));
+    Object.assign(m, d, { updated_at: nowIso() });
+    maintenanceEffect(user, m, prev);
+    if (Object.keys(changes).length) audit(user, 'maintenance.update', 'maintenance', m.id, `Manutenção "${m.title}" atualizada (${Object.keys(changes).join(', ')})`, changes);
+    return { ok: true };
+  });
+
+  on('PATCH', '/maintenances/:id/status', ({ user, params, body }) => {
+    need(user, 'maintenance:manage');
+    const m = byId('maintenances', intId(params.id)) ?? notFound('Manutenção');
+    const v = validator(body);
+    const status = v.oneOf('status', M_STATUS, { required: true, label: 'Situação' });
+    const notes = v.str('notes', { max: 5000, trim: false });
+    v.done();
+    const prev = m.status;
+    m.status = status;
+    if (notes) m.notes = m.notes ? `${m.notes}\n${notes}` : notes;
+    m.updated_at = nowIso();
+    maintenanceEffect(user, m, prev);
+    const L = { scheduled: 'Agendada', in_progress: 'Em andamento', done: 'Concluída', canceled: 'Cancelada' };
+    audit(user, 'maintenance.status', 'maintenance', m.id, `Manutenção "${m.title}": ${L[prev]} → ${L[status]}`);
+    return { ok: true };
+  });
+
+  on('DELETE', '/maintenances/:id', ({ user, params }) => {
+    need(user, 'maintenance:manage');
+    const m = byId('maintenances', intId(params.id)) ?? notFound('Manutenção');
+    if (m.status === 'in_progress') fail(400, 'Conclua ou cancele a manutenção antes de excluir.');
+    DB.maintenances = DB.maintenances.filter((x) => x.id !== m.id);
+    audit(user, 'maintenance.delete', 'maintenance', m.id, `Manutenção "${m.title}" excluída`);
+    return { ok: true };
+  });
+
+  // ---- deploys ----
+  const D_STATUS = ['success', 'failed', 'rollback', 'in_progress'];
+  const dView = (x) => ({ ...x, ...sysMini(x.system_id), created_by_name: nameOf('users', x.created_by) });
+  function parseDeploy(body) {
+    const v = validator(body);
+    const d = {
+      system_id: v.id('system_id'),
+      version: v.str('version', { max: 40 }) ?? null,
+      environment: v.oneOf('environment', ENVS, { label: 'Ambiente' }) ?? 'production',
+      platform: v.str('platform', { max: 60 }) ?? null,
+      url: v.url('url', { label: 'Link publicado' }) ?? null,
+      repository: v.str('repository', { max: 300 }) ?? null,
+      branch: v.str('branch', { max: 120 }) ?? null,
+      status: v.oneOf('status', D_STATUS, { label: 'Resultado' }) ?? 'success',
+      responsible: v.str('responsible', { max: 120 }) ?? null,
+      google_account: v.email('google_account') ?? null,
+      update_version: v.bool('update_version') ?? true,
+      notes: v.str('notes', { max: 5000, trim: false }) ?? null,
+    };
+    v.done();
+    d.deployed_at = isoOrNull(body.deployed_at, 'Data do deploy') ?? nowIso();
+    if (!d.system_id) fail(400, 'Selecione o sistema.');
+    if (!byId('systems', d.system_id)) notFound('Sistema');
+    if (d.deployed_at > new Date(Date.now() + 5 * 60_000).toISOString()) fail(400, 'A data do deploy não pode ser no futuro.');
+    return d;
+  }
+  /** Deploy bem-sucedido em produção atualiza a versão do sistema (se marcado). */
+  function deployEffect(user, x, prevStatus) {
+    const s = byId('systems', x.system_id);
+    if (!s) return;
+    if (x.status === 'success' && x.environment === 'production' && x.update_version && x.version && s.version !== x.version) {
+      const from = s.version;
+      Object.assign(s, { version: x.version, last_update_at: x.deployed_at, pending_update: false, updated_at: nowIso() });
+      insert('system_versions', { system_id: s.id, version: x.version, notes: `Deploy em produção${x.platform ? ` (${x.platform})` : ''}${x.notes ? ` — ${x.notes.slice(0, 200)}` : ''}`, released_at: x.deployed_at, created_by: user.id });
+      audit(user, 'system.update', 'system', s.id, `Versão de "${s.name}" atualizada por deploy: v${from} → v${x.version}`, { version: { from, to: x.version } });
+    }
+    if (x.status === 'failed' && prevStatus !== 'failed') {
+      notifyRoles(['admin', 'manager', 'developer'], { type: 'incident', title: `Deploy com falha: ${s.name}${x.version ? ` v${x.version}` : ''}`, message: x.notes ?? null, link: '/deploys' }, user.id);
+    }
+  }
+
+  on('GET', '/deploys', ({ user, query }) => {
+    need(user, 'deploys:view');
+    const all = DB.deploys.map(dView);
+    let list = all;
+    if (query.q) { const toks = tokens(query.q); list = list.filter((x) => matches(`${x.system_name ?? ''} ${x.version ?? ''} ${x.platform ?? ''} ${x.repository ?? ''} ${x.branch ?? ''} ${x.responsible ?? ''} ${x.google_account ?? ''} ${x.notes ?? ''}`, toks)); }
+    if (query.status) list = list.filter((x) => x.status === query.status);
+    if (query.environment) list = list.filter((x) => x.environment === query.environment);
+    if (query.system) list = list.filter((x) => x.system_id === Number(query.system));
+    list.sort((a, b) => b.deployed_at.localeCompare(a.deployed_at) || b.id - a.id);
+    const last30 = all.filter((x) => within(x.deployed_at, 30 * DAY));
+    const finished = last30.filter((x) => x.status !== 'in_progress');
+    const last = all.slice().sort((a, b) => b.deployed_at.localeCompare(a.deployed_at))[0];
+    return {
+      items: list,
+      summary: {
+        total_30d: last30.length,
+        failed_30d: last30.filter((x) => x.status === 'failed').length,
+        rollback_30d: last30.filter((x) => x.status === 'rollback').length,
+        success_rate_30d: finished.length ? (finished.filter((x) => x.status === 'success').length / finished.length) * 100 : null,
+        last: last ? { system_name: last.system_name, version: last.version, deployed_at: last.deployed_at, status: last.status } : null,
+      },
+    };
+  });
+
+  on('POST', '/deploys', ({ user, body }) => {
+    need(user, 'deploys:manage');
+    const d = parseDeploy(body);
+    const x = insert('deploys', { ...d, created_by: user.id, is_demo: false, created_at: nowIso(), updated_at: nowIso() });
+    audit(user, 'deploy.create', 'deploy', x.id, `Deploy de ${nameOf('systems', x.system_id)}${x.version ? ` v${x.version}` : ''} registrado (${x.status})`);
+    deployEffect(user, x, null);
+    return { id: x.id };
+  });
+
+  on('PUT', '/deploys/:id', ({ user, params, body }) => {
+    need(user, 'deploys:manage');
+    const x = byId('deploys', intId(params.id)) ?? notFound('Deploy');
+    const d = parseDeploy(body);
+    const prev = x.status;
+    const changes = diff(x, d, Object.keys(d));
+    Object.assign(x, d, { updated_at: nowIso() });
+    if (Object.keys(changes).length) audit(user, 'deploy.update', 'deploy', x.id, `Deploy #${x.id} atualizado (${Object.keys(changes).join(', ')})`, changes);
+    deployEffect(user, x, prev);
+    return { ok: true };
+  });
+
+  on('DELETE', '/deploys/:id', ({ user, params }) => {
+    need(user, 'deploys:manage');
+    const x = byId('deploys', intId(params.id)) ?? notFound('Deploy');
+    DB.deploys = DB.deploys.filter((r) => r.id !== x.id);
+    audit(user, 'deploy.delete', 'deploy', x.id, `Deploy #${x.id} de ${nameOf('systems', x.system_id) ?? 'sistema removido'} excluído`);
+    return { ok: true };
+  });
+
+  // ---- anotações pessoais (bloco de notas) ----
+  const NOTE_COLORS = ['yellow', 'blue', 'green', 'pink', 'purple', 'gray'];
+  const myNote = (user, id) => {
+    const n = byId('notes', intId(id));
+    if (!n || n.user_id !== user.id) notFound('Anotação');
+    return n;
+  };
+  on('GET', '/notes', ({ user, query }) => {
+    let list = DB.notes.filter((n) => n.user_id === user.id);
+    if (query.q) { const toks = tokens(query.q); list = list.filter((n) => matches(n.content, toks)); }
+    return list.slice().sort((a, b) => (b.pinned === true) - (a.pinned === true) || b.updated_at.localeCompare(a.updated_at));
+  });
+  on('POST', '/notes', ({ user, body }) => {
+    const v = validator(body);
+    const content = v.str('content', { max: 10000, required: true, trim: false, label: 'Anotação' });
+    const color = v.oneOf('color', NOTE_COLORS) ?? 'yellow';
+    v.done();
+    if (!content.trim()) fail(400, 'Escreva algo na anotação.');
+    const n = insert('notes', { user_id: user.id, content, color, pinned: false, created_at: nowIso(), updated_at: nowIso() });
+    return { id: n.id };
+  });
+  on('PUT', '/notes/:id', ({ user, params, body }) => {
+    const n = myNote(user, params.id);
+    const v = validator(body);
+    const content = v.str('content', { max: 10000, trim: false, label: 'Anotação' });
+    const color = v.oneOf('color', NOTE_COLORS);
+    const pinned = v.bool('pinned');
+    v.done();
+    if (content !== undefined) {
+      if (!content || !content.trim()) fail(400, 'A anotação não pode ficar vazia — exclua se não precisar mais.');
+      n.content = content;
+    }
+    if (color) n.color = color;
+    if (pinned !== undefined) n.pinned = pinned;
+    n.updated_at = nowIso();
+    return { ok: true };
+  });
+  on('DELETE', '/notes/:id', ({ user, params }) => {
+    const n = myNote(user, params.id);
+    DB.notes = DB.notes.filter((x) => x.id !== n.id);
+    return { ok: true };
+  });
+
   // ---- notificações, auditoria e busca ----
   on('GET', '/notifications', ({ user }) => {
     const mine = DB.notifications.filter((n) => n.user_id === user.id);
@@ -3257,7 +3752,12 @@ async function render(root) {
       ${header()}
       <div class="stack" style="gap:24px">
         ${hasDemo ? demoNotice() : ''}
-        ${t.public_open || d.backups?.late || d.backups?.failed || d.billing?.overdue || d.billing?.due_soon ? html`<div class="row wrap" style="gap:12px">
+        ${d.db_update_pending ? html`<a class="alert-box" style="display:block;text-decoration:none" href="/configuracao">
+          <p class="strong row" style="color:inherit">${ic('alert-triangle', 'sm')} Atualização do banco de dados pendente</p>
+          <p class="small mt-1">Algumas funções novas (como Bancos de dados, Manutenções, Deploys e Anotações) ainda não têm tabelas no Supabase. Rode novamente o script SQL de instalação (Configurações → Copiar script SQL → SQL Editor → Run).</p></a>` : ''}
+        ${t.public_open || d.backups?.late || d.backups?.failed || d.billing?.overdue || d.billing?.due_soon || d.maintenance?.in_progress || d.maintenance?.late || d.maintenance?.next7 ? html`<div class="row wrap" style="gap:12px">
+          ${d.maintenance?.in_progress || d.maintenance?.late || d.maintenance?.next7 ? html`<a class="notice" style="border-color:var(--info-ring);background:var(--info-bg);color:var(--info);text-decoration:none" href="/manutencoes">${ic('wrench', 'sm')}
+            <span>Manutenções: <strong>${d.maintenance.in_progress}</strong> em andamento · <strong>${d.maintenance.next7}</strong> nos próximos 7 dias${d.maintenance.late ? html` · <strong>${d.maintenance.late}</strong> atrasada(s)` : ''}</span></a>` : ''}
           ${t.public_open ? html`<a class="notice" style="border-color:var(--info-ring);background:var(--info-bg);color:var(--info);text-decoration:none" href="/tickets">${ic('link', 'sm')}
             <span><strong>${t.public_open}</strong> chamado(s) aberto(s) pelo link público aguardando atendimento</span></a>` : ''}
           ${d.backups?.failed || d.backups?.late ? html`<a class="notice" style="border-color:var(--bad-ring);background:var(--bad-bg);color:var(--bad);text-decoration:none" href="/backups">${ic('hard-drive', 'sm')}
@@ -3365,7 +3865,7 @@ async function render(root, { query }) {
         <select class="input" id="sort" style="width:auto" aria-label="Ordenar">
           ${options([
             ['name:asc', 'Nome (A–Z)'], ['name:desc', 'Nome (Z–A)'], ['status:asc', 'Status (problemas primeiro)'],
-            ['criticality:asc', 'Criticidade (maior primeiro)'], ['updated:desc', 'Atualizados recentemente'], ['category:asc', 'Categoria'],
+            ['criticality:asc', 'Criticidade (maior primeiro)'], ['updated:desc', 'Atualizados recentemente'], ['created:desc', 'Criados recentemente'], ['created:asc', 'Mais antigos'], ['category:asc', 'Categoria'],
           ], `${f.sort}:${f.dir}`)}
         </select>
         <div class="segmented" role="group" aria-label="Visualização">
@@ -3455,6 +3955,7 @@ async function render(root, { query }) {
       <dl class="meta">
         <dt>Responsável</dt><dd>${s.technical_owner_name ?? '—'}</dd>
         <dt>Equipe</dt><dd>${s.team_name ?? '—'}</dd>
+        <dt>Criado em</dt><dd>${formatDate(s.created_on)}</dd>
         <dt>Última atualização</dt><dd>${formatDate(s.last_update_at)}</dd>
       </dl>
       <div class="actions">${accessLink(s, { sm: true, cls: 'grow' })}<a class="btn sm" href="/systems/${s.id}">Ver detalhes</a></div>
@@ -3463,7 +3964,7 @@ async function render(root, { query }) {
   const sortTh = (k, label) => html`<th><button data-sort="${k}">${label} <span style="opacity:${f.sort === k ? 1 : 0.3}">${ic('arrow-up-down', 'sm')}</span></button></th>`;
   const table = (items) => html`<div class="card table-wrap"><table class="table">
     <thead><tr><th></th>${sortTh('name', 'Sistema')}${sortTh('category', 'Categoria')}${sortTh('status', 'Status')}${sortTh('criticality', 'Criticidade')}
-      <th>Responsável / Equipe</th><th>Versão</th>${sortTh('updated', 'Atualizado')}<th class="right">Acesso</th></tr></thead>
+      <th>Responsável / Equipe</th><th>Versão</th>${sortTh('created', 'Criado em')}${sortTh('updated', 'Atualizado')}<th class="right">Acesso</th></tr></thead>
     <tbody>${items.map((s) => html`
       <tr class="clickable" data-go="/systems/${s.id}">
         <td>${favButton(s)}</td>
@@ -3473,6 +3974,7 @@ async function render(root, { query }) {
         <td>${critBadge(s.criticality)}</td>
         <td><p class="nowrap">${s.technical_owner_name ?? '—'}</p><p class="xs muted nowrap">${s.team_name ?? ''}</p></td>
         <td class="nowrap">v${s.version} ${s.pending_update ? html`<span title="Atualização pendente" style="color:var(--accent-600)">${ic('download', 'sm')}</span>` : ''}</td>
+        <td class="nowrap">${formatDate(s.created_on)}</td>
         <td class="nowrap">${formatDate(s.last_update_at)}</td>
         <td class="right">${accessLink(s, { iconOnly: true })}</td>
       </tr>`)}</tbody></table></div>`;
@@ -3610,6 +4112,8 @@ async function render(root, { params }) {
             <dl class="card-body info-grid" style="margin:0">
               ${info('Link de acesso', html`<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.url} ${ic('external-link', 'sm')}</a>`)}
               ${info('Categoria', s.category)}
+              ${info('Data de criação', formatDate(s.created_on))}
+              ${info('Conta Google', s.google_account ? html`<a href="mailto:${s.google_account}">${s.google_account}</a>` : '—')}
               ${info('Versão atual', `v${s.version}`)}
               ${info('Última atualização', html`${formatDate(s.last_update_at)} <span class="xs muted">(${timeAgo(s.last_update_at)})</span>`)}
               ${info('Criticidade', CRITICALITY[s.criticality].label)}
@@ -3617,7 +4121,9 @@ async function render(root, { params }) {
               ${info('Status operacional', html`${STATUS[s.status].label} <span class="xs muted">· ${STATUS_SOURCE[s.status_source].label} · ${timeAgo(s.status_updated_at)}</span>`)}
               ${info('Origem dos dados', html`${DATA_ORIGIN[s.data_origin].label} <span class="xs muted">· ${DATA_ORIGIN[s.data_origin].hint}</span>`)}
               ${info('Monitoramento', s.monitoring_enabled ? (s.data_origin === 'demo' ? 'Simulado (demonstração)' : 'Automático (healthcheck)') : 'Manual')}
-            </dl></div>
+            </dl>
+            <div style="padding:16px 20px;border-top:1px solid var(--border)"><p class="xs muted strong" style="margin-bottom:4px">Observações</p>
+              ${s.notes ? html`<p class="pre small">${s.notes}</p>` : html`<p class="small muted">Nenhuma observação.</p>`}</div></div>
           <div class="stack" style="gap:24px">
             <div class="card"><div class="card-header"><div><h3>Disponibilidade</h3><p class="sub">${s.uptime.checks_30d} verificações em 30 dias</p></div></div>
               <div class="kpis">${[['24h', s.uptime.uptime_24h], ['7 dias', s.uptime.uptime_7d], ['30 dias', s.uptime.uptime_30d]].map(([l, v]) => html`<div><p class="v">${formatPercent(v, 2)}</p><p class="xs muted">${l}</p></div>`)}</div>
@@ -3862,7 +4368,9 @@ const EMPTY = {
   name: '', icon: 'box', color: '#244487', description: '', category: '', url: 'https://', technical_owner_id: null, team_id: null,
   version: '1.0.0', criticality: 'medium', technologies: [], data_sources: [], integrations: [], documentation_url: '', documentation: '',
   healthcheck_url: '', monitoring_enabled: false, pending_update: false, restricted: false, data_origin: 'manual', contacts: [],
+  created_on: '', notes: '', google_account: '',
 };
+const localToday = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
 
 /** Campo de tags: Enter ou vírgula adiciona; Backspace remove a última. */
 function tagInput(name, values, placeholder) {
@@ -3875,7 +4383,7 @@ async function render(root, { params }) {
   const isAdmin = state.user.role === 'admin';
   root.innerHTML = String(skeleton(200, 3));
 
-  let f = structuredClone(EMPTY);
+  let f = { ...structuredClone(EMPTY), created_on: localToday() };
   let people = [];
   let teams = [];
   let categories = [];
@@ -3926,6 +4434,12 @@ async function render(root, { params }) {
               ${field('Link de acesso *', html`<input class="input" type="url" name="url" value="${f.url}" />`)}
               ${field('Versão atual', html`<input class="input" name="version" value="${f.version}" maxlength="40" />`, { hint: id ? 'Alterar a versão registra uma entrada no histórico' : '' })}
               ${field('Nível de criticidade', html`<select class="input" name="criticality" ${lockGov ? 'disabled' : ''}>${options(Object.entries(CRITICALITY).map(([k, v]) => [k, v.label]), f.criticality)}</select>`, { hint: lockGov ? 'Somente administradores alteram' : '' })}
+              ${field('Data de criação', html`<input class="input" type="date" name="created_on" value="${f.created_on}" max="${localToday()}" />`, { hint: 'Quando o sistema foi criado (pode ser anterior ao cadastro).' })}
+              ${field('Conta Google', html`<input class="input" type="email" name="google_account" value="${f.google_account}" placeholder="conta@gmail.com" maxlength="160" />`, { hint: 'Conta usada para criar/hospedar o sistema.' })}
+            </div></div>
+          <div class="card"><div class="card-header"><h3>Observações</h3></div>
+            <div class="card-body">
+              ${field('Observações gerais', html`<textarea class="input" name="notes" maxlength="5000" style="min-height:110px" placeholder="Anotações livres sobre o sistema. Não coloque senhas aqui.">${f.notes}</textarea>`)}
             </div></div>
           <div class="card"><div class="card-header"><h3>Informações técnicas</h3></div>
             <div class="card-body grid cols-2">
@@ -4078,6 +4592,9 @@ async function render(root, { params }) {
       team_id: val('team_id') || null,
       healthcheck_url: val('healthcheck_url').trim(),
       data_origin: val('data_origin'),
+      created_on: val('created_on'),
+      notes: val('notes'),
+      google_account: val('google_account').trim(),
     };
     delete body._name;
     if (lockGov) { delete body.restricted; delete body.data_origin; delete body.criticality; }
@@ -4087,6 +4604,8 @@ async function render(root, { params }) {
     if (body.name.length < 2) errors.name = 'Informe o nome';
     if (body.category.length < 2) errors.category = 'Informe a categoria';
     if (!/^https?:\/\/\S+$/.test(body.url)) errors.url = 'Informe uma URL http(s) válida';
+    if (body.google_account && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.google_account)) errors.google_account = 'E-mail inválido';
+    if (body.created_on && body.created_on > localToday()) errors.created_on = 'Não pode ser no futuro';
     if (body.monitoring_enabled && !body.healthcheck_url && body.data_origin !== 'demo') errors.healthcheck_url = 'Obrigatório para monitoramento automático';
     form.querySelectorAll('.field .error').forEach((x) => x.remove());
     form.querySelectorAll('.invalid').forEach((x) => x.classList.remove('invalid'));
@@ -4885,7 +5404,8 @@ window.Pages['users'] = render;
 // ===================== page-audit =====================
 // Página: audit
 (function () {
-const ENTITIES = { system: 'Sistemas', ticket: 'Chamados', user: 'Usuários', person: 'Responsáveis', team: 'Equipes', monitoring: 'Monitoramento' };
+const ENTITIES = { system: 'Sistemas', ticket: 'Chamados', user: 'Usuários', person: 'Responsáveis', team: 'Equipes', monitoring: 'Monitoramento',
+  maintenance: 'Manutenções', deploy: 'Deploys', database: 'Bancos de dados' };
 
 async function render(root) {
   const f = { q: '', entity: '', page: 1 };
@@ -5895,6 +6415,728 @@ window.Pages = window.Pages || {};
 window.Pages['billing'] = render;
 })();
 
+// ===================== page-databases =====================
+// Página: bancos de dados dos sistemas (projetos Supabase, PostgreSQL, MySQL…)
+(function () {
+const ENGINES = ['Supabase', 'PostgreSQL', 'MySQL', 'MariaDB', 'SQL Server', 'MongoDB', 'Firebase', 'SQLite', 'Oracle', 'Redis', 'PlanetScale', 'Neon'];
+const REGIONS = [
+  'South America (São Paulo) — sa-east-1', 'East US (North Virginia) — us-east-1', 'East US (Ohio) — us-east-2', 'West US (N. California) — us-west-1',
+  'West US (Oregon) — us-west-2', 'Central Canada — ca-central-1', 'West EU (Ireland) — eu-west-1', 'West EU (London) — eu-west-2', 'West EU (Paris) — eu-west-3',
+  'Central EU (Frankfurt) — eu-central-1', 'Central EU (Zurich) — eu-central-2', 'North EU (Stockholm) — eu-north-1', 'South Asia (Mumbai) — ap-south-1',
+  'Southeast Asia (Singapore) — ap-southeast-1', 'Northeast Asia (Tokyo) — ap-northeast-1', 'Northeast Asia (Seoul) — ap-northeast-2', 'Oceania (Sydney) — ap-southeast-2',
+];
+const short = (v, n = 6) => (v && v.length > n * 2 + 1 ? `${v.slice(0, n)}…${v.slice(-n)}` : v);
+const host = (u) => { try { return new URL(u).host; } catch { return u; } };
+
+async function render(root) {
+  const manage = can('databases:manage');
+  const secrets = can('databases:secrets');
+  const f = { q: '', environment: '', system: '', rls: '' };
+  let data = null;
+  const shown = new Map(); // id -> senha revelada
+  const systems = await cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Bancos de dados</h1><p class="sub">Projetos de banco de cada sistema: links, chaves públicas, região, RLS e conta Google</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('plus', 'sm')} Novo banco</button>` : ''}
+    </div>
+    <div id="dsum" class="mb-6">${skeleton(110, 1)}</div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:220px">${ic('search', 'sm')}<input class="input" id="dq" placeholder="Buscar por projeto, banco, referência, região, sistema ou conta Google" aria-label="Buscar bancos" /></div>
+      <select class="input" style="width:180px" data-f="environment" aria-label="Ambiente">${options(Object.entries(ENVIRONMENT).map(([k, v]) => [k, v.label]), '', { empty: 'Todos os ambientes' })}</select>
+      <select class="input" style="width:220px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), '', { empty: 'Todos os sistemas' })}</select>
+    </div></div>
+    <div id="dlist">${skeleton(56, 4)}</div>`);
+
+  const load = async () => {
+    try {
+      data = await api.get('/databases', f);
+      drawSummary();
+      drawList();
+    } catch (err) {
+      root.querySelector('#dlist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const drawSummary = () => {
+    const s = data.summary;
+    const tile = (label, value, iconName, tone, hint, quick) => html`
+      <button class="card stat clickable" style="text-align:left;border:1px solid var(--border)" data-quick="${quick ?? ''}">
+        <span class="s-head">${label}<span class="s-icon ic-${tone}">${ic(iconName)}</span></span>
+        <span class="s-value">${value}</span><span class="s-hint">${hint}</span></button>`;
+    root.querySelector('#dsum').innerHTML = String(html`
+      ${s.rls_off ? html`<div class="alert-box mb-4"><p class="strong row" style="color:inherit">${ic('alert-triangle', 'sm')} RLS desativado</p>
+        <p class="small mt-1">${s.rls_off} banco(s) sem Row Level Security. Sem RLS, qualquer pessoa com a chave pública pode ler e alterar os dados das tabelas.</p></div>` : ''}
+      <div class="grid cols-4">
+        ${tile('Bancos cadastrados', s.total, 'database', 'navy', `${s.engines} tecnologia(s) diferente(s)`, '')}
+        ${tile('Em produção', s.production, 'server', 'ok', 'Ambiente de produção', 'env:production')}
+        ${tile('Sem RLS', s.rls_off, 'shield-check', s.rls_off ? 'bad' : 'ok', 'Row Level Security desligado', 'rls:off')}
+        ${tile('Senhas', secrets ? 'Admin' : 'Restritas', 'lock', 'info', secrets ? 'Visíveis só para administradores' : 'Somente administradores veem', null)}
+      </div>`);
+  };
+
+  const passwordCell = (r) => {
+    if (!secrets) return html`<span class="xs muted row" style="gap:4px" title="Somente administradores">${ic('lock', 'sm')}restrita</span>`;
+    if (!r.has_password) return html`<span class="muted">—</span>`;
+    const val = shown.get(r.id);
+    return html`<span class="row nowrap" style="gap:2px"><code class="xs">${val ?? '••••••••'}</code>
+      <button class="btn ghost sm icon" data-reveal="${r.id}" title="${val ? 'Ocultar' : 'Mostrar'}" aria-label="${val ? 'Ocultar senha' : 'Mostrar senha'}">${ic(val ? 'eye-off' : 'eye', 'sm')}</button>
+      <button class="btn ghost sm icon" data-copy-pass="${r.id}" title="Copiar senha" aria-label="Copiar senha">${ic('copy', 'sm')}</button></span>`;
+  };
+  const copyCell = (value, n = 6) => (value
+    ? html`<span class="row nowrap" style="gap:2px"><code class="xs" title="${value}">${short(value, n)}</code><button class="btn ghost sm icon" data-copy="${value}" title="Copiar" aria-label="Copiar">${ic('copy', 'sm')}</button></span>`
+    : html`<span class="muted">—</span>`);
+
+  const drawList = () => {
+    const items = data.items;
+    root.querySelector('#dlist').innerHTML = String(items.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Banco de dados</th><th>Link</th><th>Nome do projeto</th><th>Senha projeto</th><th>Chave pública</th><th>Project Reference ID</th>
+        <th>Ambiente</th><th>Região</th><th>RLS ativo?</th><th>Criação</th><th>Conta Google</th><th>Observações</th><th></th></tr></thead>
+      <tbody>${items.map((r) => html`<tr>
+        <td class="nowrap"><span class="row" style="gap:6px">${ic('database', 'sm')}<strong>${r.engine}</strong></span></td>
+        <td class="nowrap">${r.url ? html`<a href="${r.url}" target="_blank" rel="noopener noreferrer" title="${r.url}">${short(host(r.url), 12)} ${ic('external-link', 'sm')}</a>` : html`<span class="muted">—</span>`}</td>
+        <td style="min-width:160px"><p class="strong">${r.project_name}</p>${r.system_name ? html`<a class="xs muted" href="/systems/${r.system_id}">${r.system_name}</a>` : ''}</td>
+        <td>${passwordCell(r)}</td>
+        <td>${copyCell(r.public_key)}</td>
+        <td>${copyCell(r.project_ref, 10)}</td>
+        <td>${badge(ENVIRONMENT[r.environment]?.label ?? r.environment, ENVIRONMENT[r.environment]?.tone)}</td>
+        <td class="xs" style="min-width:140px">${r.region ?? '—'}</td>
+        <td>${r.rls_enabled ? html`<span class="row text-ok nowrap" style="gap:4px">${ic('check-circle', 'sm')}Sim</span>` : html`<span class="row text-bad nowrap" style="gap:4px">${ic('alert-triangle', 'sm')}Não</span>`}</td>
+        <td class="nowrap">${formatDate(r.created_on)}</td>
+        <td class="xs">${r.google_account ?? '—'}</td>
+        <td class="xs muted" style="max-width:220px"><span class="clamp-2" title="${r.notes ?? ''}">${r.notes ?? '—'}</span></td>
+        <td class="right nowrap">${manage ? html`<button class="btn ghost sm icon" data-edit="${r.id}" title="Editar" aria-label="Editar ${r.project_name}">${ic('pencil', 'sm')}</button>
+          <button class="btn ghost sm icon" data-del="${r.id}" title="Excluir" aria-label="Excluir ${r.project_name}" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}</td>
+      </tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhum banco de dados cadastrado', manage ? 'Cadastre os bancos dos seus sistemas para ter links, chaves e regiões num só lugar.' : '', 'database')}</div>`);
+  };
+
+  const dbModal = async (r = { engine: 'Supabase', environment: 'production', rls_enabled: true }) => {
+    const st = { rls_enabled: r.rls_enabled !== false };
+    openModal({
+      title: r.id ? 'Editar banco de dados' : 'Novo banco de dados',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate autocomplete="off">
+        ${field('Banco de dados *', html`<input class="input" name="engine" value="${r.engine ?? ''}" list="engines" maxlength="60" placeholder="Ex.: Supabase" />
+          <datalist id="engines">${ENGINES.map((e) => html`<option value="${e}"></option>`)}</datalist>`)}
+        ${field('Nome do projeto *', html`<input class="input" name="project_name" value="${r.project_name ?? ''}" maxlength="120" placeholder="Ex.: nexora-producao" />`)}
+        ${field('Sistema', html`<select class="input" name="system_id">${options(systems.map((s) => [s.id, s.name]), r.system_id, { empty: '— Nenhum —' })}</select>`)}
+        ${field('Ambiente', html`<select class="input" name="environment">${options(Object.entries(ENVIRONMENT).map(([k, v]) => [k, v.label]), r.environment)}</select>`)}
+        ${field('Link', html`<input class="input" type="url" name="url" value="${r.url ?? ''}" placeholder="https://xxxx.supabase.co" />`, { cls: 'span-all', hint: 'Endereço do projeto ou do painel. Para Supabase, o Project Reference ID é preenchido sozinho.' })}
+        ${field('Project Reference ID', html`<input class="input mono" name="project_ref" value="${r.project_ref ?? ''}" maxlength="120" />`)}
+        ${field('Região', html`<input class="input" name="region" value="${r.region ?? ''}" list="regions" maxlength="120" placeholder="Ex.: South America (São Paulo)" />
+          <datalist id="regions">${REGIONS.map((e) => html`<option value="${e}"></option>`)}</datalist>`)}
+        ${field('Chave pública (anon / publishable)', html`<textarea class="input mono" name="public_key" rows="2" maxlength="1000" placeholder="sb_publishable_… ou eyJ…">${r.public_key ?? ''}</textarea>`,
+          { cls: 'span-all', hint: 'Nunca cole aqui a chave secreta (service_role / sb_secret) — o sistema recusa.' })}
+        ${secrets ? field('Senha do projeto', html`<div class="input-icon" style="position:relative"><input class="input" type="password" name="project_password" maxlength="500" autocomplete="new-password"
+            placeholder="${r.id ? (r.has_password ? 'Deixe em branco para manter a atual' : 'Nenhuma senha guardada') : 'Senha do banco (opcional)'}" style="padding-left:12px;padding-right:40px" />
+            <button type="button" class="btn ghost sm icon" data-toggle-pass style="position:absolute;right:4px;top:50%;transform:translateY(-50%)" aria-label="Mostrar senha">${ic('eye', 'sm')}</button></div>`,
+          { hint: 'Visível somente para administradores. Cada visualização fica registrada na auditoria.' })
+          : html`<div class="xs muted row" style="align-self:end;gap:6px">${ic('lock', 'sm')} Somente administradores cadastram senhas.</div>`}
+        ${field('Data de criação', html`<input class="input" type="date" name="created_on" value="${r.created_on ?? ''}" />`)}
+        ${field('Conta Google', html`<input class="input" type="email" name="google_account" value="${r.google_account ?? ''}" maxlength="160" placeholder="conta@gmail.com" />`)}
+        <div style="align-self:end">${toggle('rls_enabled', st.rls_enabled, 'RLS ativo', 'Row Level Security ligado nas tabelas.')}</div>
+        ${field('Observações', html`<textarea class="input" name="notes" maxlength="5000">${r.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        bindToggles(el, st);
+        const url = el.querySelector('[name=url]');
+        const ref = el.querySelector('[name=project_ref]');
+        url.addEventListener('input', () => {
+          const m = /^https?:\/\/([a-z0-9]{15,30})\.supabase\.co/i.exec(url.value.trim());
+          if (m && !ref.value.trim()) ref.value = m[1];
+        });
+        el.querySelector('[data-toggle-pass]')?.addEventListener('click', (e) => {
+          const inp = el.querySelector('[name=project_password]');
+          inp.type = inp.type === 'password' ? 'text' : 'password';
+          e.currentTarget.innerHTML = String(ic(inp.type === 'password' ? 'eye' : 'eye-off', 'sm'));
+        });
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = { ...Object.fromEntries(new FormData(el.querySelector('form'))), rls_enabled: st.rls_enabled };
+          if (!body.project_password) delete body.project_password; // em branco = mantém
+          try {
+            if (r.id) await api.put(`/databases/${r.id}`, body);
+            else await api.post('/databases', body);
+            shown.delete(r.id);
+            toast('Banco salvo');
+            close();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const getSecret = async (id) => (await api.get(`/databases/${id}/secret`)).password;
+
+  const dq = root.querySelector('#dq');
+  dq.addEventListener('input', debounce(() => { f.q = dq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', async (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return dbModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const q = t.closest('[data-quick]');
+    if (q && q.dataset.quick !== undefined) {
+      const [k, v] = q.dataset.quick.split(':');
+      f.environment = k === 'env' ? v : '';
+      f.rls = k === 'rls' ? v : '';
+      root.querySelector('[data-f=environment]').value = f.environment;
+      return load();
+    }
+    const cp = t.closest('[data-copy]');
+    if (cp) return copyText(cp.dataset.copy);
+    const rv = t.closest('[data-reveal]');
+    if (rv) {
+      const id = Number(rv.dataset.reveal);
+      try {
+        if (shown.has(id)) shown.delete(id);
+        else shown.set(id, (await getSecret(id)) ?? '');
+        drawList();
+      } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
+    const cpp = t.closest('[data-copy-pass]');
+    if (cpp) {
+      try { await copyText((await getSecret(Number(cpp.dataset.copyPass))) ?? ''); } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
+    const ed = t.closest('[data-edit]');
+    if (ed) return dbModal(data.items.find((r) => r.id === Number(ed.dataset.edit)));
+    const del = t.closest('[data-del]');
+    if (del) {
+      const r = data.items.find((x) => x.id === Number(del.dataset.del));
+      if (!(await confirmDialog({ title: 'Excluir banco de dados', danger: true, confirmLabel: 'Excluir', message: html`Excluir o cadastro de <strong>${r.project_name}</strong>? A senha guardada também será apagada. O banco real não é afetado.` }))) return;
+      try { await api.del(`/databases/${r.id}`); shown.delete(r.id); toast('Banco excluído'); await load(); } catch (err) { toast(err.message, 'error'); }
+    }
+  });
+
+  await load();
+}
+
+window.Pages = window.Pages || {};
+window.Pages['databases'] = render;
+})();
+
+// ===================== page-maintenance =====================
+// Página: manutenções dos sistemas (agendadas, em andamento e histórico)
+(function () {
+const toLocalInput = (iso) => (iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : '');
+const toIso = (v) => (v ? new Date(v).toISOString() : '');
+const mBadge = (m) => (m.late ? badge('Atrasada', 'bad') : badge(MAINT_STATUS[m.status].label, MAINT_STATUS[m.status].tone));
+
+async function render(root, { query }) {
+  const manage = can('maintenance:manage');
+  const f = { q: '', status: '', kind: '', system: query.get('system') ?? '' };
+  let data = null;
+  const [systems, people] = await Promise.all([
+    cached('systems-options', () => api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name })))).catch(() => []),
+    api.get('/people').catch(() => []),
+  ]);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Manutenções</h1><p class="sub">Agende, acompanhe e registre as manutenções de cada sistema</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('plus', 'sm')} Nova manutenção</button>` : ''}
+    </div>
+    <div id="msum" class="mb-6">${skeleton(110, 1)}</div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:220px">${ic('search', 'sm')}<input class="input" id="mq" placeholder="Buscar por título, sistema, responsável ou conta Google" aria-label="Buscar manutenções" /></div>
+      <select class="input" style="width:180px" data-f="status" aria-label="Situação">${options([...Object.entries(MAINT_STATUS).map(([k, v]) => [k, v.label]), ['late', 'Atrasadas']], '', { empty: 'Todas as situações' })}</select>
+      <select class="input" style="width:170px" data-f="kind" aria-label="Tipo">${options(Object.entries(MAINT_KIND), '', { empty: 'Todos os tipos' })}</select>
+      <select class="input" style="width:220px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), f.system, { empty: 'Todos os sistemas' })}</select>
+    </div></div>
+    <div id="mlist">${skeleton(56, 4)}</div>`);
+
+  const load = async () => {
+    try {
+      data = await api.get('/maintenances', f);
+      drawSummary();
+      drawList();
+    } catch (err) {
+      root.querySelector('#mlist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const drawSummary = () => {
+    const s = data.summary;
+    const tile = (label, value, iconName, tone, hint, quick) => html`
+      <button class="card stat clickable" style="text-align:left;border:1px solid var(--border)" data-quick="${quick}">
+        <span class="s-head">${label}<span class="s-icon ic-${tone}">${ic(iconName)}</span></span>
+        <span class="s-value">${value}</span><span class="s-hint">${hint}</span></button>`;
+    root.querySelector('#msum').innerHTML = String(html`
+      ${s.late ? html`<div class="alert-box mb-4"><p class="strong row" style="color:inherit">${ic('alert-triangle', 'sm')} Manutenções atrasadas</p>
+        <p class="small mt-1">${s.late} manutenção(ões) passaram da data agendada e ainda não foram iniciadas.</p></div>` : ''}
+      <div class="grid cols-4">
+        ${tile('Em andamento', s.in_progress, 'wrench', 'demo', 'Sistemas em manutenção agora', 'in_progress')}
+        ${tile('Agendadas', s.scheduled, 'calendar-clock', 'info', 'Aguardando a data', 'scheduled')}
+        ${tile('Atrasadas', s.late, 'alert-triangle', s.late ? 'bad' : 'ok', 'Data agendada já passou', 'late')}
+        ${tile('Concluídas em 30 dias', s.done_30d, 'check-circle', 'ok', 'Histórico recente', 'done')}
+      </div>`);
+  };
+
+  const drawList = () => {
+    const items = data.items;
+    root.querySelector('#mlist').innerHTML = String(items.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Sistema</th><th>Manutenção</th><th>Situação</th><th>Agendada para</th><th>Início / conclusão</th><th>Responsável</th><th>Conta Google</th><th>Observações</th><th></th></tr></thead>
+      <tbody>${items.map((m) => html`<tr class="clickable" data-open="${m.id}">
+        <td style="min-width:170px"><div class="row">${sysIcon(m.system_icon, m.system_color, 'sm')}<span class="strong">${m.system_name ?? '—'}</span></div></td>
+        <td style="min-width:200px"><p class="strong">${m.title}</p><p class="xs muted">${MAINT_KIND[m.kind] ?? m.kind}${m.affects_status ? ' · altera o status do sistema' : ''}</p></td>
+        <td>${mBadge(m)}</td>
+        <td class="nowrap ${m.late ? 'text-bad strong' : ''}">${m.scheduled_for ? formatDateTime(m.scheduled_for) : '—'}</td>
+        <td class="xs nowrap">${m.started_at ? html`<p>Início: ${formatDateTime(m.started_at)}</p>` : ''}${m.finished_at ? html`<p>${m.status === 'canceled' ? 'Cancelada' : 'Fim'}: ${formatDateTime(m.finished_at)}</p>` : ''}${!m.started_at && !m.finished_at ? '—' : ''}</td>
+        <td class="nowrap">${m.responsible ?? '—'}</td>
+        <td class="xs">${m.google_account ?? '—'}</td>
+        <td class="xs muted" style="max-width:220px"><span class="clamp-2" title="${m.notes ?? ''}">${m.notes ?? '—'}</span></td>
+        <td class="right nowrap">${manage ? html`
+          ${m.status === 'scheduled' ? html`<button class="btn sm" data-start="${m.id}">${ic('play-circle', 'sm')} Iniciar</button>` : ''}
+          ${m.status === 'in_progress' ? html`<button class="btn primary sm" data-finish="${m.id}">${ic('check', 'sm')} Concluir</button>` : ''}` : ''}</td>
+      </tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhuma manutenção encontrada', manage ? 'Agende manutenções para avisar a equipe e colocar o sistema “Em manutenção” automaticamente.' : '', 'wrench')}</div>`);
+  };
+
+  const mModal = (m = { kind: 'preventive', status: 'scheduled', affects_status: true, system_id: f.system || '' }) => {
+    const st = { affects_status: m.affects_status !== false };
+    openModal({
+      title: m.id ? 'Editar manutenção' : 'Nova manutenção',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate>
+        ${field('Sistema *', html`<select class="input" name="system_id">${options(systems.map((s) => [s.id, s.name]), m.system_id, { empty: '— Selecione —' })}</select>`)}
+        ${field('Título *', html`<input class="input" name="title" value="${m.title ?? ''}" maxlength="160" placeholder="Ex.: Atualização do servidor" />`)}
+        ${field('Tipo', html`<select class="input" name="kind">${options(Object.entries(MAINT_KIND), m.kind)}</select>`)}
+        ${field('Situação', html`<select class="input" name="status">${options(Object.entries(MAINT_STATUS).map(([k, v]) => [k, v.label]), m.status)}</select>`)}
+        ${field('Agendada para', html`<input class="input" type="datetime-local" name="scheduled_for" value="${toLocalInput(m.scheduled_for)}" />`)}
+        ${field('Concluída em', html`<input class="input" type="datetime-local" name="finished_at" value="${toLocalInput(m.finished_at)}" max="${toLocalInput(new Date().toISOString())}" />`, { hint: 'Opcional — para registrar uma manutenção já feita.' })}
+        ${field('Responsável', html`<input class="input" name="responsible" value="${m.responsible ?? ''}" maxlength="120" list="m-people" />
+          <datalist id="m-people">${people.map((p) => html`<option value="${p.name}"></option>`)}</datalist>`)}
+        ${field('Conta Google', html`<input class="input" type="email" name="google_account" value="${m.google_account ?? ''}" maxlength="160" placeholder="conta@gmail.com" />`)}
+        <div class="span-all">${toggle('affects_status', st.affects_status, 'Colocar o sistema “Em manutenção” enquanto estiver em andamento', 'Ao concluir, o sistema volta para Operacional. O monitoramento não gera alertas durante a manutenção.')}</div>
+        ${field('O que será feito', html`<textarea class="input" name="description" maxlength="5000">${m.description ?? ''}</textarea>`, { cls: 'span-all' })}
+        ${field('Observações', html`<textarea class="input" name="notes" maxlength="5000">${m.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        bindToggles(el, st);
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = { ...Object.fromEntries(new FormData(el.querySelector('form'))), affects_status: st.affects_status };
+          body.scheduled_for = toIso(body.scheduled_for);
+          body.finished_at = toIso(body.finished_at);
+          try {
+            if (m.id) await api.put(`/maintenances/${m.id}`, body);
+            else await api.post('/maintenances', body);
+            toast('Manutenção salva');
+            close();
+            refreshNotifications();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const setStatus = async (m, status, notes) => {
+    await api.patch(`/maintenances/${m.id}/status`, { status, notes });
+    toast(status === 'in_progress' ? 'Manutenção iniciada' : status === 'done' ? 'Manutenção concluída' : 'Situação atualizada');
+    refreshNotifications();
+    await load();
+  };
+
+  const finishModal = (m) => openModal({
+    title: 'Concluir manutenção',
+    description: `${m.system_name} · ${m.title}`,
+    body: html`<div class="stack">
+      ${field('O que foi feito? (opcional)', html`<textarea class="input" name="notes" placeholder="Ex.: servidor atualizado, backup validado…"></textarea>`)}
+      ${m.affects_status ? html`<p class="xs muted">${m.system_name} voltará para o status Operacional.</p>` : ''}
+    </div>`,
+    footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>${ic('check', 'sm')} Concluir</button>`,
+    onMount: (el, close) => el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      try { await setStatus(m, 'done', el.querySelector('[name=notes]').value); close(); } catch (err) { toast(err.message, 'error'); }
+    })),
+  });
+
+  const openM = (m) => {
+    const d = openDrawer({
+      head: html`<p class="strong">Manutenção</p><div class="row">
+        ${manage ? html`<button class="btn sm" data-edit-d>${ic('pencil', 'sm')} Editar</button>
+          ${m.status !== 'in_progress' ? html`<button class="btn ghost sm icon" data-del-d aria-label="Excluir manutenção" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}` : ''}
+        <button class="btn ghost icon" data-close aria-label="Fechar">${ic('x')}</button></div>`,
+      body: html`
+        <div class="row">${sysIcon(m.system_icon, m.system_color)}<div><h2 style="font-size:20px">${m.title}</h2><p class="xs muted"><a href="/systems/${m.system_id}">${m.system_name}</a></p></div></div>
+        <div class="row wrap mt-3">${mBadge(m)}${badge(MAINT_KIND[m.kind] ?? m.kind)}</div>
+        <dl class="facts">
+          <div><dt>Agendada para</dt><dd>${formatDateTime(m.scheduled_for)}</dd></div>
+          <div><dt>Início</dt><dd>${formatDateTime(m.started_at)}</dd></div>
+          <div><dt>${m.status === 'canceled' ? 'Cancelada em' : 'Conclusão'}</dt><dd>${formatDateTime(m.finished_at)}</dd></div>
+          <div><dt>Responsável</dt><dd>${m.responsible ?? '—'}</dd></div>
+          <div><dt>Conta Google</dt><dd>${m.google_account ?? '—'}</dd></div>
+          <div><dt>Altera status do sistema</dt><dd>${m.affects_status ? 'Sim' : 'Não'}</dd></div>
+          <div><dt>Cadastrada por</dt><dd>${m.created_by_name ?? '—'}</dd></div>
+          <div><dt>Cadastrada em</dt><dd>${formatDateTime(m.created_at)}</dd></div>
+        </dl>
+        ${m.description ? html`<h3 class="mt-6 mb-4" style="font-size:14px">O que será feito</h3><p class="pre small">${m.description}</p>` : ''}
+        ${m.notes ? html`<h3 class="mt-6 mb-4" style="font-size:14px">Observações</h3><p class="pre small">${m.notes}</p>` : ''}`,
+    });
+    d.el.querySelector('[data-edit-d]')?.addEventListener('click', () => { d.close(); mModal(m); });
+    d.el.querySelector('[data-del-d]')?.addEventListener('click', async () => {
+      if (!(await confirmDialog({ title: 'Excluir manutenção', danger: true, confirmLabel: 'Excluir', message: html`Excluir a manutenção <strong>${m.title}</strong>?` }))) return;
+      try { await api.del(`/maintenances/${m.id}`); toast('Manutenção excluída'); d.close(); await load(); } catch (err) { toast(err.message, 'error'); }
+    });
+  };
+
+  const mq = root.querySelector('#mq');
+  mq.addEventListener('input', debounce(() => { f.q = mq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', async (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return mModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const q = t.closest('[data-quick]');
+    if (q) { f.status = q.dataset.quick; root.querySelector('[data-f=status]').value = f.status; return load(); }
+    const find = (id) => data.items.find((m) => m.id === Number(id));
+    const start = t.closest('[data-start]');
+    if (start) {
+      const m = find(start.dataset.start);
+      const ok = await confirmDialog({ title: 'Iniciar manutenção', confirmLabel: 'Iniciar', message: m.affects_status
+        ? html`Iniciar <strong>${m.title}</strong>? O sistema <strong>${m.system_name}</strong> ficará “Em manutenção” e a equipe será avisada.`
+        : html`Iniciar <strong>${m.title}</strong>?` });
+      if (ok) try { await setStatus(m, 'in_progress'); } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
+    const fin = t.closest('[data-finish]');
+    if (fin) return finishModal(find(fin.dataset.finish));
+    const row = t.closest('[data-open]');
+    if (row && !t.closest('a, button')) openM(find(row.dataset.open));
+  });
+
+  await load();
+}
+
+window.Pages = window.Pages || {};
+window.Pages['maintenance'] = render;
+})();
+
+// ===================== page-deploys =====================
+// Página: deploys (publicações) dos sistemas
+(function () {
+const PLATFORMS = ['GitHub Pages', 'Vercel', 'Netlify', 'Supabase', 'Render', 'Railway', 'Heroku', 'Cloudflare Pages', 'Firebase Hosting', 'AWS', 'Google Cloud', 'Azure', 'Hostinger', 'Servidor próprio (VPS)'];
+const toLocalInput = (iso) => (iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : '');
+const dBadge = (s) => html`<span class="badge tone-${DEPLOY_STATUS[s].tone}">${ic(DEPLOY_STATUS[s].icon, 'sm')}${DEPLOY_STATUS[s].label}</span>`;
+const repoLink = (r) => (/^https?:\/\//i.test(r ?? '') ? html`<a href="${r}" target="_blank" rel="noopener noreferrer">${r.replace(/^https?:\/\/(www\.)?(github\.com\/)?/i, '')}</a>` : r);
+
+async function render(root, { query }) {
+  const manage = can('deploys:manage');
+  const f = { q: '', status: '', environment: '', system: query.get('system') ?? '' };
+  let data = null;
+  const [systems, people] = await Promise.all([
+    api.get('/systems', { pageSize: 500 }).then((d) => d.items.map((s) => ({ id: s.id, name: s.name, version: s.version, url: s.url }))).catch(() => []),
+    api.get('/people').catch(() => []),
+  ]);
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Deploys</h1><p class="sub">Histórico de publicações: versão, ambiente, plataforma, resultado e conta Google</p></div>
+      ${manage ? html`<button class="btn accent" data-action="new">${ic('rocket', 'sm')} Registrar deploy</button>` : ''}
+    </div>
+    <div id="psum" class="mb-6">${skeleton(110, 1)}</div>
+    <div class="card filters mb-4"><div class="row wrap">
+      <div class="input-icon grow" style="min-width:220px">${ic('search', 'sm')}<input class="input" id="pq" placeholder="Buscar por sistema, versão, plataforma, repositório ou responsável" aria-label="Buscar deploys" /></div>
+      <select class="input" style="width:170px" data-f="status" aria-label="Resultado">${options(Object.entries(DEPLOY_STATUS).map(([k, v]) => [k, v.label]), '', { empty: 'Todos os resultados' })}</select>
+      <select class="input" style="width:180px" data-f="environment" aria-label="Ambiente">${options(Object.entries(ENVIRONMENT).map(([k, v]) => [k, v.label]), '', { empty: 'Todos os ambientes' })}</select>
+      <select class="input" style="width:220px" data-f="system" aria-label="Sistema">${options(systems.map((s) => [s.id, s.name]), f.system, { empty: 'Todos os sistemas' })}</select>
+    </div></div>
+    <div id="plist">${skeleton(56, 4)}</div>`);
+
+  const load = async () => {
+    try {
+      data = await api.get('/deploys', f);
+      drawSummary();
+      drawList();
+    } catch (err) {
+      root.querySelector('#plist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const drawSummary = () => {
+    const s = data.summary;
+    const tile = (label, value, iconName, tone, hint, quick) => html`
+      <button class="card stat clickable" style="text-align:left;border:1px solid var(--border)" data-quick="${quick}">
+        <span class="s-head">${label}<span class="s-icon ic-${tone}">${ic(iconName)}</span></span>
+        <span class="s-value">${value}</span><span class="s-hint">${hint}</span></button>`;
+    root.querySelector('#psum').innerHTML = String(html`<div class="grid cols-4">
+      ${tile('Deploys em 30 dias', s.total_30d, 'rocket', 'navy', 'Todas as publicações registradas', '')}
+      ${tile('Taxa de sucesso', formatPercent(s.success_rate_30d, 0), 'check-circle', 'ok', 'Últimos 30 dias', 'success')}
+      ${tile('Falhas e rollbacks', s.failed_30d + s.rollback_30d, 'alert-octagon', s.failed_30d ? 'bad' : 'ok', `${s.failed_30d} falha(s) · ${s.rollback_30d} rollback(s)`, 'failed')}
+      ${tile('Último deploy', s.last ? timeAgo(s.last.deployed_at) : '—', 'clock', 'info', s.last ? `${s.last.system_name ?? '—'}${s.last.version ? ` · v${s.last.version}` : ''}` : 'Nenhum registrado', '')}
+    </div>`);
+  };
+
+  const drawList = () => {
+    const items = data.items;
+    root.querySelector('#plist').innerHTML = String(items.length ? html`<div class="card table-wrap"><table class="table">
+      <thead><tr><th>Data</th><th>Sistema</th><th>Versão</th><th>Ambiente</th><th>Plataforma</th><th>Resultado</th><th>Link publicado</th><th>Repositório / branch</th><th>Responsável</th><th>Conta Google</th><th>Observações</th><th></th></tr></thead>
+      <tbody>${items.map((x) => html`<tr>
+        <td class="nowrap" title="${formatDateTime(x.deployed_at)}"><p>${formatDateTime(x.deployed_at)}</p><p class="xs muted">${timeAgo(x.deployed_at)}</p></td>
+        <td style="min-width:160px"><div class="row">${sysIcon(x.system_icon, x.system_color, 'sm')}<a class="strong" style="color:inherit" href="/systems/${x.system_id}">${x.system_name ?? '—'}</a></div></td>
+        <td class="nowrap">${x.version ? `v${x.version}` : '—'}</td>
+        <td>${badge(ENVIRONMENT[x.environment]?.label ?? x.environment, ENVIRONMENT[x.environment]?.tone)}</td>
+        <td class="nowrap">${x.platform ?? '—'}</td>
+        <td>${dBadge(x.status)}</td>
+        <td class="nowrap">${x.url ? html`<a href="${x.url}" target="_blank" rel="noopener noreferrer">Abrir ${ic('external-link', 'sm')}</a>` : '—'}</td>
+        <td class="xs" style="max-width:220px">${x.repository ? html`<p class="truncate">${repoLink(x.repository)}</p>` : ''}${x.branch ? html`<p class="row muted" style="gap:4px">${ic('git-branch', 'sm')}${x.branch}</p>` : ''}${!x.repository && !x.branch ? '—' : ''}</td>
+        <td class="nowrap">${x.responsible ?? '—'}</td>
+        <td class="xs">${x.google_account ?? '—'}</td>
+        <td class="xs muted" style="max-width:220px"><span class="clamp-2" title="${x.notes ?? ''}">${x.notes ?? '—'}</span></td>
+        <td class="right nowrap">${manage ? html`<button class="btn ghost sm icon" data-edit="${x.id}" title="Editar" aria-label="Editar deploy">${ic('pencil', 'sm')}</button>
+          <button class="btn ghost sm icon" data-del="${x.id}" title="Excluir" aria-label="Excluir deploy" style="color:#e11d48">${ic('trash', 'sm')}</button>` : ''}</td>
+      </tr>`)}</tbody></table></div>`
+      : html`<div class="card">${emptyState('Nenhum deploy registrado', manage ? 'Registre cada publicação para ter o histórico de versões, plataformas e falhas.' : '', 'rocket')}</div>`);
+  };
+
+  const dModal = (x = { environment: 'production', status: 'success', update_version: true, system_id: f.system || '' }) => {
+    const st = { update_version: x.update_version !== false };
+    const lastFor = (sid) => data?.items.find((r) => r.system_id === Number(sid)); // mais recente (lista ordenada por data)
+    openModal({
+      title: x.id ? 'Editar deploy' : 'Registrar deploy',
+      size: 'lg',
+      body: html`<form class="grid cols-2" novalidate>
+        ${field('Sistema *', html`<select class="input" name="system_id">${options(systems.map((s) => [s.id, s.name]), x.system_id, { empty: '— Selecione —' })}</select>`)}
+        ${field('Versão', html`<input class="input" name="version" value="${x.version ?? ''}" maxlength="40" placeholder="Ex.: 1.4.0" />`)}
+        ${field('Ambiente', html`<select class="input" name="environment">${options(Object.entries(ENVIRONMENT).map(([k, v]) => [k, v.label]), x.environment)}</select>`)}
+        ${field('Resultado', html`<select class="input" name="status">${options(Object.entries(DEPLOY_STATUS).map(([k, v]) => [k, v.label]), x.status)}</select>`)}
+        ${field('Plataforma', html`<input class="input" name="platform" value="${x.platform ?? ''}" maxlength="60" list="platforms" placeholder="Ex.: GitHub Pages" />
+          <datalist id="platforms">${PLATFORMS.map((p) => html`<option value="${p}"></option>`)}</datalist>`)}
+        ${field('Data e hora do deploy', html`<input class="input" type="datetime-local" name="deployed_at" value="${toLocalInput(x.deployed_at ?? new Date().toISOString())}" />`)}
+        ${field('Link publicado', html`<input class="input" type="url" name="url" value="${x.url ?? ''}" placeholder="https://" />`, { cls: 'span-all' })}
+        ${field('Repositório', html`<input class="input" name="repository" value="${x.repository ?? ''}" maxlength="300" placeholder="https://github.com/usuario/projeto" />`)}
+        ${field('Branch', html`<input class="input" name="branch" value="${x.branch ?? ''}" maxlength="120" placeholder="main" />`)}
+        ${field('Responsável', html`<input class="input" name="responsible" value="${x.responsible ?? ''}" maxlength="120" list="d-people" />
+          <datalist id="d-people">${people.map((p) => html`<option value="${p.name}"></option>`)}</datalist>`)}
+        ${field('Conta Google', html`<input class="input" type="email" name="google_account" value="${x.google_account ?? ''}" maxlength="160" placeholder="conta@gmail.com" />`)}
+        <div class="span-all">${toggle('update_version', st.update_version, 'Atualizar a versão do sistema', 'Deploy com sucesso em Produção muda a versão atual do sistema e entra no histórico de versões.')}</div>
+        ${field('Observações', html`<textarea class="input" name="notes" maxlength="5000" placeholder="O que mudou nesta versão, problemas encontrados…">${x.notes ?? ''}</textarea>`, { cls: 'span-all' })}
+      </form>`,
+      footer: html`<button class="btn" data-close>Cancelar</button><button class="btn primary" data-save>Salvar</button>`,
+      onMount: (el, close) => {
+        bindToggles(el, st);
+        if (!x.id) {
+          // ao escolher o sistema, sugere dados do último deploy dele
+          el.querySelector('[name=system_id]').addEventListener('change', (e) => {
+            const prev = lastFor(e.target.value);
+            const sys = systems.find((s) => s.id === Number(e.target.value));
+            const set = (n, v) => { const i = el.querySelector(`[name=${n}]`); if (v && !i.value) i.value = v; };
+            set('platform', prev?.platform); set('repository', prev?.repository); set('branch', prev?.branch);
+            set('google_account', prev?.google_account); set('url', prev?.url ?? sys?.url);
+            const ver = el.querySelector('[name=version]');
+            if (sys?.version) ver.placeholder = `Atual: ${sys.version}`;
+          });
+        }
+        el.querySelector('[data-save]').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+          const body = { ...Object.fromEntries(new FormData(el.querySelector('form'))), update_version: st.update_version };
+          body.deployed_at = body.deployed_at ? new Date(body.deployed_at).toISOString() : '';
+          try {
+            if (x.id) await api.put(`/deploys/${x.id}`, body);
+            else await api.post('/deploys', body);
+            toast('Deploy salvo');
+            close();
+            refreshNotifications();
+            await load();
+          } catch (err) { toast(err.message, 'error'); }
+        }));
+      },
+    });
+  };
+
+  const pq = root.querySelector('#pq');
+  pq.addEventListener('input', debounce(() => { f.q = pq.value.trim(); load(); }, 250));
+  root.addEventListener('change', (e) => {
+    const s = e.target.closest('[data-f]');
+    if (s) { f[s.dataset.f] = s.value; load(); }
+  });
+  root.addEventListener('click', async (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=new]')) return dModal();
+    if (t.closest('[data-action=retry]')) return load();
+    const q = t.closest('[data-quick]');
+    if (q) { f.status = q.dataset.quick; root.querySelector('[data-f=status]').value = f.status; return load(); }
+    const ed = t.closest('[data-edit]');
+    if (ed) return dModal(data.items.find((x) => x.id === Number(ed.dataset.edit)));
+    const del = t.closest('[data-del]');
+    if (del) {
+      const x = data.items.find((r) => r.id === Number(del.dataset.del));
+      if (!(await confirmDialog({ title: 'Excluir deploy', danger: true, confirmLabel: 'Excluir', message: html`Excluir o registro do deploy de <strong>${x.system_name}</strong>${x.version ? ` v${x.version}` : ''}? A versão do sistema não é alterada.` }))) return;
+      try { await api.del(`/deploys/${x.id}`); toast('Deploy excluído'); await load(); } catch (err) { toast(err.message, 'error'); }
+    }
+  });
+
+  await load();
+}
+
+window.Pages = window.Pages || {};
+window.Pages['deploys'] = render;
+})();
+
+// ===================== page-notes =====================
+// Página: anotações (bloco de notas pessoal e simples)
+(function () {
+const NOTE_COLORS = { yellow: 'Amarelo', blue: 'Azul', green: 'Verde', pink: 'Rosa', purple: 'Roxo', gray: 'Cinza' };
+const dots = (current, attr) => html`<span class="note-dots">${Object.entries(NOTE_COLORS).map(([k, label]) => html`
+  <button type="button" class="note-dot nc-${k} ${k === current ? 'on' : ''}" ${raw(`${attr}="${k}"`)} title="${label}" aria-label="Cor ${label}"></button>`)}</span>`;
+
+async function render(root) {
+  let notes = [];
+  let q = '';
+  let newColor = 'yellow';
+  const timers = new Map();
+
+  root.innerHTML = String(html`
+    <div class="page-header">
+      <div><h1>Anotações</h1><p class="sub">Seu bloco de notas — anote o que quiser. Só você vê as suas anotações.</p></div>
+    </div>
+    <div class="card note-composer mb-6">
+      <textarea class="input" id="new-note" placeholder="Escreva uma anotação…" aria-label="Nova anotação" maxlength="10000"></textarea>
+      <div class="row wrap mt-3" style="justify-content:space-between">
+        <span id="new-dots">${dots(newColor, 'data-new-color')}</span>
+        <div class="row"><span class="xs muted">Ctrl + Enter para salvar</span><button class="btn primary" data-action="add">${ic('plus', 'sm')} Adicionar</button></div>
+      </div>
+    </div>
+    <div class="row mb-4"><div class="input-icon grow" style="max-width:420px">${ic('search', 'sm')}<input class="input" id="nq" placeholder="Buscar nas anotações" aria-label="Buscar nas anotações" /></div>
+      <span class="xs muted" id="ncount"></span></div>
+    <div id="nlist">${skeleton(120, 2)}</div>`);
+
+  const $ = (s) => root.querySelector(s);
+  const autoHeight = (ta) => { ta.style.height = 'auto'; ta.style.height = `${ta.scrollHeight + 2}px`; };
+
+  const load = async () => {
+    try {
+      notes = await api.get('/notes', { q });
+      draw();
+    } catch (err) {
+      $('#nlist').innerHTML = String(errorState(err));
+    }
+  };
+
+  const draw = () => {
+    $('#ncount').textContent = notes.length ? `${notes.length} anotação(ões)` : '';
+    $('#nlist').innerHTML = String(notes.length ? html`<div class="notes-grid">${notes.map((n) => html`
+      <div class="note nc-${n.color}" data-note="${n.id}">
+        <textarea class="note-text" data-text="${n.id}" aria-label="Anotação" maxlength="10000">${n.content}</textarea>
+        <div class="note-foot">
+          <span class="xs note-time" title="Criada em ${formatDateTime(n.created_at)}">${n.updated_at !== n.created_at ? 'editada ' : ''}${timeAgo(n.updated_at)}</span>
+          <span class="row" style="gap:2px">
+            ${dots(n.color, `data-color-${n.id}`)}
+            <button class="btn ghost sm icon ${n.pinned ? 'pinned' : ''}" data-pin="${n.id}" title="${n.pinned ? 'Desafixar' : 'Fixar no topo'}" aria-label="${n.pinned ? 'Desafixar' : 'Fixar'}">${ic('pin', 'sm')}</button>
+            <button class="btn ghost sm icon" data-copy-note="${n.id}" title="Copiar texto" aria-label="Copiar texto">${ic('copy', 'sm')}</button>
+            <button class="btn ghost sm icon" data-del-note="${n.id}" title="Excluir" aria-label="Excluir anotação" style="color:#e11d48">${ic('trash', 'sm')}</button>
+          </span>
+        </div>
+      </div>`)}</div>`
+      : html`<div class="card">${emptyState(q ? 'Nenhuma anotação encontrada' : 'Nenhuma anotação ainda', q ? 'Tente outra palavra.' : 'Escreva no campo acima — ideias, lembretes, comandos, links…', 'sticky-note')}</div>`);
+    root.querySelectorAll('.note-text').forEach(autoHeight);
+  };
+
+  const add = async () => {
+    const ta = $('#new-note');
+    const content = ta.value;
+    if (!content.trim()) return ta.focus();
+    try {
+      await api.post('/notes', { content, color: newColor });
+      ta.value = '';
+      autoHeight(ta);
+      await load();
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  const saveText = async (id, content) => {
+    clearTimeout(timers.get(id));
+    timers.delete(id);
+    const n = notes.find((x) => x.id === id);
+    if (!n || n.content === content) return;
+    if (!content.trim()) return toast('A anotação está vazia — use a lixeira para excluir.', 'error');
+    try {
+      await api.put(`/notes/${id}`, { content });
+      n.content = content;
+      n.updated_at = new Date().toISOString();
+      const time = root.querySelector(`[data-note="${id}"] .note-time`);
+      if (time) time.textContent = 'salvo agora';
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  const nt = $('#new-note');
+  nt.addEventListener('input', () => autoHeight(nt));
+  nt.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); add(); } });
+  $('#nq').addEventListener('input', debounce((e) => { q = e.target.value.trim(); load(); }, 250));
+
+  root.addEventListener('input', (e) => {
+    const ta = e.target.closest('[data-text]');
+    if (!ta) return;
+    autoHeight(ta);
+    const id = Number(ta.dataset.text);
+    clearTimeout(timers.get(id));
+    timers.set(id, setTimeout(() => saveText(id, ta.value), 900)); // salva sozinho após parar de digitar
+  });
+  root.addEventListener('focusout', (e) => {
+    const ta = e.target.closest?.('[data-text]');
+    if (ta) saveText(Number(ta.dataset.text), ta.value);
+  });
+
+  root.addEventListener('click', async (e) => {
+    const t = e.target;
+    if (t.closest('[data-action=add]')) return add();
+    if (t.closest('[data-action=retry]')) return load();
+    const nc = t.closest('[data-new-color]');
+    if (nc) {
+      newColor = nc.dataset.newColor;
+      $('#new-dots').innerHTML = String(dots(newColor, 'data-new-color'));
+      return;
+    }
+    const card = t.closest('[data-note]');
+    if (!card) return;
+    const id = Number(card.dataset.note);
+    const n = notes.find((x) => x.id === id);
+    const color = t.closest(`[data-color-${id}]`);
+    try {
+      if (color) {
+        await api.put(`/notes/${id}`, { color: color.getAttribute(`data-color-${id}`) });
+        return load();
+      }
+      if (t.closest('[data-pin]')) {
+        await api.put(`/notes/${id}`, { pinned: !n.pinned });
+        return load();
+      }
+      if (t.closest('[data-copy-note]')) return copyText(card.querySelector('[data-text]').value);
+      if (t.closest('[data-del-note]')) {
+        if (!(await confirmDialog({ title: 'Excluir anotação', danger: true, confirmLabel: 'Excluir', message: 'Excluir esta anotação? Não dá para desfazer.' }))) return;
+        clearTimeout(timers.get(id));
+        await api.del(`/notes/${id}`);
+        toast('Anotação excluída');
+        return load();
+      }
+    } catch (err) { toast(err.message, 'error'); }
+  });
+
+  await load();
+  nt.focus();
+  return () => {
+    // salva o que estiver pendente ao sair da página
+    for (const [id] of timers) {
+      const ta = document.querySelector(`[data-text="${id}"]`);
+      if (ta) saveText(id, ta.value);
+    }
+  };
+}
+
+window.Pages = window.Pages || {};
+window.Pages['notes'] = render;
+})();
+
 // ===================== app =====================
 // ---------- estado global ----------
 const state = { user: null, permissions: [] };
@@ -5912,6 +7154,10 @@ const ROUTES = [
   { re: /^\/clients$/, page: 'clients', perm: 'clients:view' },
   { re: /^\/backups$/, page: 'backups', perm: 'backups:view' },
   { re: /^\/dominios$/, page: 'billing', perm: 'billing:view' },
+  { re: /^\/bancos$/, page: 'databases', perm: 'databases:view' },
+  { re: /^\/manutencoes$/, page: 'maintenance', perm: 'maintenance:view' },
+  { re: /^\/deploys$/, page: 'deploys', perm: 'deploys:view' },
+  { re: /^\/anotacoes$/, page: 'notes', perm: 'notes:use' },
   { re: /^\/users$/, page: 'users', perm: 'users:manage' },
   { re: /^\/audit$/, page: 'audit', perm: 'audit:view' },
   { re: /^\/configuracao$/, page: 'settings', perm: 'settings:manage' },
@@ -5921,10 +7167,14 @@ const NAV = [
   { to: '/', label: 'Dashboard', icon: 'layout-dashboard' },
   { to: '/systems', label: 'Catálogo de sistemas', icon: 'layout-grid' },
   { to: '/monitoring', label: 'Monitoramento', icon: 'activity', perm: 'monitoring:view' },
+  { to: '/manutencoes', label: 'Manutenções', icon: 'wrench', perm: 'maintenance:view' },
+  { to: '/deploys', label: 'Deploys', icon: 'rocket', perm: 'deploys:view' },
+  { to: '/bancos', label: 'Bancos de dados', icon: 'database', perm: 'databases:view' },
   { to: '/backups', label: 'Backups', icon: 'hard-drive', perm: 'backups:view' },
   { to: '/dominios', label: 'Domínios e mensalidades', icon: 'globe', perm: 'billing:view' },
   { to: '/tickets', label: 'Chamados', icon: 'kanban' },
   { to: '/clients', label: 'Clientes', icon: 'briefcase', perm: 'clients:view' },
+  { to: '/anotacoes', label: 'Anotações', icon: 'sticky-note', perm: 'notes:use' },
   { to: '/people', label: 'Responsáveis', icon: 'contact' },
   { to: '/users', label: 'Usuários e acessos', icon: 'users', perm: 'users:manage' },
   { to: '/audit', label: 'Auditoria', icon: 'scroll-text', perm: 'audit:view' },
